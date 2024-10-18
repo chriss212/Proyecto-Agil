@@ -7,6 +7,7 @@ class EmployeeEvaluationApp:
     def __init__(self, master):
         self.master = master
         master.title("Evaluación del Desempeño de Empleados")
+        master.geometry("800x600")  # Ventana de tamaño 800x600
 
         # Conexión a la base de datos
         self.connect_db()
@@ -35,17 +36,17 @@ class EmployeeEvaluationApp:
         """Crear la pantalla de inicio de sesión."""
         self.clear_window()
 
-        tk.Label(self.master, text="Iniciar Sesión").pack()
+        tk.Label(self.master, text="Iniciar Sesión", font=("Arial", 16)).pack(pady=20)
 
         tk.Label(self.master, text="Usuario:").pack()
         self.username_entry = tk.Entry(self.master)
-        self.username_entry.pack()
+        self.username_entry.pack(pady=5)
 
         tk.Label(self.master, text="Contraseña:").pack()
         self.password_entry = tk.Entry(self.master, show='*')
-        self.password_entry.pack()
+        self.password_entry.pack(pady=5)
 
-        tk.Button(self.master, text="Iniciar Sesión", command=self.login).pack()
+        tk.Button(self.master, text="Iniciar Sesión", command=self.login).pack(pady=20)
 
     def clear_window(self):
         """Limpiar la ventana actual."""
@@ -78,31 +79,31 @@ class EmployeeEvaluationApp:
         """Mostrar la interfaz del gerente."""
         self.clear_window()
         
-        tk.Label(self.master, text="Bienvenido Gerente").pack()
+        tk.Label(self.master, text="Bienvenido Gerente", font=("Arial", 16)).pack(pady=20)
 
         self.manager_evaluation_button = tk.Button(self.master, text="Evaluar Empleado", command=self.manager_evaluation)
-        self.manager_evaluation_button.pack()
+        self.manager_evaluation_button.pack(pady=5)
 
         self.previous_evaluations_button = tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations)
-        self.previous_evaluations_button.pack()
+        self.previous_evaluations_button.pack(pady=5)
 
         self.compare_performance_button = tk.Button(self.master, text="Comparar Desempeño de Empleados", command=self.compare_performance)
-        self.compare_performance_button.pack()
+        self.compare_performance_button.pack(pady=5)
 
         self.report_button = tk.Button(self.master, text="Generar Reporte de Desempeño", command=self.generate_report)
-        self.report_button.pack()
+        self.report_button.pack(pady=5)
 
     def show_employee_interface(self):
         """Mostrar la interfaz del empleado."""
         self.clear_window()
         
-        tk.Label(self.master, text="Bienvenido Empleado").pack()
+        tk.Label(self.master, text="Bienvenido Empleado", font=("Arial", 16)).pack(pady=20)
 
         self.self_evaluation_button = tk.Button(self.master, text="Realizar Autoevaluación", command=self.self_evaluation)
-        self.self_evaluation_button.pack()
+        self.self_evaluation_button.pack(pady=5)
 
         self.previous_evaluations_button = tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations)
-        self.previous_evaluations_button.pack()
+        self.previous_evaluations_button.pack(pady=5)
 
     def self_evaluation(self):
         questions = {
@@ -132,7 +133,7 @@ class EmployeeEvaluationApp:
         responses = []
         
         for category, qs in questions.items():
-            messagebox.showinfo("Autoevaluación", f"Categoría: {category}")
+            self.show_full_window("Autoevaluación", f"Categoría: {category}")  # Ventana completa
             for question in qs:
                 response = simpledialog.askinteger("Autoevaluación", f"{question}\n(1: Malo, 5: Excelente)", minvalue=1, maxvalue=5)
                 if response is not None:  # Verifica que el usuario no cancele
@@ -163,6 +164,13 @@ class EmployeeEvaluationApp:
                 messagebox.showerror("Error", f"No se pudo guardar la autoevaluación: {e}")
         else:
             messagebox.showwarning("Advertencia", "Nombre de empleado no ingresado.")
+
+    def show_full_window(self, title, message):
+        """Mostrar una ventana completa."""
+        full_window = tk.Toplevel(self.master)
+        full_window.title(title)
+        full_window.geometry("800x600")  # Ajustar el tamaño de la ventana
+        tk.Label(full_window, text=message, font=("Arial", 16)).pack(pady=20)
 
     def manager_evaluation(self):
         employee_name = simpledialog.askstring("Nombre del Empleado", "Ingresa el nombre del empleado a evaluar:")
@@ -207,82 +215,84 @@ class EmployeeEvaluationApp:
             messagebox.showwarning("Advertencia", "Nombre de empleado no ingresado.")
 
     def view_previous_evaluations(self):
-        employee_name = simpledialog.askstring("Nombre del Empleado", "Ingresa tu nombre:")
+        self.clear_window()
         
-        if employee_name:
-            try:
-                # Consultar evaluaciones anteriores desde la base de datos
-                self.cursor.execute("SELECT autoevaluacion, evaluacion_gerente FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
-                
-                result = self.cursor.fetchone()
-                
-                if result:
-                    evaluations_text = f"Evaluaciones anteriores para {employee_name}:\n\n"
-                    evaluations_text += f"Autoevaluación: {result[0]}\n"
-                    evaluations_text += f"Evaluación por Gerente: {result[1]}\n"
-                    messagebox.showinfo("Evaluaciones Anteriores", evaluations_text.strip())
-                else:
-                    messagebox.showinfo("Evaluaciones Anteriores", f"No se encontraron evaluaciones para {employee_name}.")
-                
-            except mariadb.Error as e:
-                messagebox.showerror("Error", f"No se pudieron recuperar las evaluaciones: {e}")
+        tk.Label(self.master, text="Evaluaciones Anteriores", font=("Arial", 16)).pack(pady=20)
+
+        try:
+            # Obtener todas las evaluaciones
+            self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
+            evaluations = self.cursor.fetchall()
+
+            for eval in evaluations:
+                emp_name, self_eval, mgr_eval = eval
+                tk.Label(self.master, text=f"Empleado: {emp_name}", font=("Arial", 14)).pack()
+                tk.Label(self.master, text=f"Autoevaluación: {self_eval}", font=("Arial", 12)).pack()
+                tk.Label(self.master, text=f"Evaluación del Gerente: {mgr_eval}", font=("Arial", 12)).pack()
+                tk.Label(self.master, text="").pack()  # Espaciado
+
+        except mariadb.Error as e:
+            messagebox.showerror("Error", f"No se pudo obtener las evaluaciones: {e}")
 
     def compare_performance(self):
-        employees_to_compare = simpledialog.askstring("Comparar Desempeño", 
-                                                       "Ingresa los nombres de los empleados separados por comas:")
+        self.clear_window()
         
-        if employees_to_compare:
-            employee_list = [name.strip() for name in employees_to_compare.split(',')]
-            
-            report_text = "Comparativa de Desempeño:\n\n"
-            
-            for employee in employee_list:
-                try:
-                    # Consultar las evaluaciones desde la base de datos
-                    self.cursor.execute("SELECT autoevaluacion FROM evaluaciones WHERE nombre_empleado=?", (employee,))
-                    result = self.cursor.fetchone()
-                    
-                    if result:
-                        report_text += f"Empleado: {employee}\nAutoevaluación: {result[0]}\n\n"
-                    else:
-                        report_text += f"Empleado: {employee} no encontrado.\n\n"
-                except mariadb.Error as e:
-                    messagebox.showerror("Error", f"No se pudo recuperar las evaluaciones para {employee}: {e}")
+        tk.Label(self.master, text="Comparar Desempeño de Empleados", font=("Arial", 16)).pack(pady=20)
 
-            # Mostrar comparativa en una ventana nueva
-            compare_window = tk.Toplevel(self.master)
-            compare_window.title("Comparativa de Desempeño")
-            compare_window.focus_force()  # Hacer que esta ventana esté activa
+        try:
+            self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
+            evaluations = self.cursor.fetchall()
 
-            compare_text_area = scrolledtext.ScrolledText(compare_window, width=50, height=20)
-            compare_text_area.insert(tk.END, report_text.strip())
-            compare_text_area.pack()
+            if evaluations:
+                for eval in evaluations:
+                    emp_name, self_eval, mgr_eval = eval
+                    tk.Label(self.master, text=f"Empleado: {emp_name}", font=("Arial", 14)).pack()
+                    tk.Label(self.master, text=f"Autoevaluación: {self_eval}", font=("Arial", 12)).pack()
+                    tk.Label(self.master, text=f"Evaluación del Gerente: {mgr_eval}", font=("Arial", 12)).pack()
+                    tk.Label(self.master, text="").pack()  # Espaciado
+
+            else:
+                tk.Label(self.master, text="No hay evaluaciones para mostrar.", font=("Arial", 12)).pack()
+
+        except mariadb.Error as e:
+            messagebox.showerror("Error", f"No se pudo obtener las evaluaciones: {e}")
 
     def generate_report(self):
-        report_text = "Reporte de Desempeño General:\n\n"
+        self.clear_window()
         
-        try:
-            # Consultar todas las evaluaciones desde la base de datos
-            self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
-            
-            for row in self.cursor.fetchall():
-                report_text += f"Empleado: {row[0]}\n"
-                report_text += f"Autoevaluación: {row[1]}\n"
-                report_text += f"Evaluación por Gerente: {row[2]}\n\n"
+        tk.Label(self.master, text="Generar Reporte de Desempeño", font=("Arial", 16)).pack(pady=20)
 
-            # Mostrar reporte en una ventana nueva
+        try:
+            self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
+            evaluations = self.cursor.fetchall()
+
+            report_text = "Reporte de Desempeño:\n\n"
+            for eval in evaluations:
+                emp_name, self_eval, mgr_eval = eval
+                report_text += f"Empleado: {emp_name}\nAutoevaluación: {self_eval}\nEvaluación del Gerente: {mgr_eval}\n\n"
+
             report_window = tk.Toplevel(self.master)
             report_window.title("Reporte de Desempeño")
-            report_window.focus_force()  # Hacer que esta ventana esté activa
+            report_window.geometry("800x600")  # Ventana de tamaño 800x600
 
-            report_text_area = scrolledtext.ScrolledText(report_window, width=50, height=20)
-            report_text_area.insert(tk.END, report_text.strip())
-            report_text_area.pack()
-          
+            text_area = scrolledtext.ScrolledText(report_window, wrap=tk.WORD)
+            text_area.pack(expand=True, fill='both')
+            text_area.insert(tk.INSERT, report_text)
+            text_area.config(state=tk.DISABLED)  # Hacer el área de texto solo lectura
+
+            tk.Button(report_window, text="Cerrar", command=report_window.destroy).pack(pady=5)
+
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo generar el reporte: {e}")
+
+    def close_app(self):
+        """Cerrar la aplicación."""
+        self.conn.close()  # Cerrar conexión a la base de datos
+        self.master.quit()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = EmployeeEvaluationApp(root)
+    root.protocol("WM_DELETE_WINDOW", app.close_app)  # Manejar el cierre de la ventana
     root.mainloop()
