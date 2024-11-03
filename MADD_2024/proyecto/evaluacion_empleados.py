@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog, scrolledtext
+from tkinter import messagebox
 import mariadb
 import sys
 
@@ -7,44 +7,22 @@ class EmployeeEvaluationApp:
     def __init__(self, master):
         self.master = master
         master.title("Evaluación del Desempeño de Empleados")
+        master.geometry("400x400")
+        master.configure(bg="#f0f4f7")
 
         # Conexión a la base de datos
         self.connect_db()
 
-        self.label = tk.Label(master, text="Sistema de Evaluación")
-        self.label.pack()
-
-        self.role_entry = tk.Entry(master)
-        self.role_entry.insert(0, "Ingrese el rol del empleado")
-        self.role_entry.pack()
-
-        self.criteria_entry = tk.Entry(master)
-        self.criteria_entry.insert(0, "Ingrese criterios (separados por coma)")
-        self.criteria_entry.pack()
-
-        self.submit_criteria_button = tk.Button(master, text="Guardar Criterios", command=self.save_criteria)
-        self.submit_criteria_button.pack()
-
-        self.self_evaluation_button = tk.Button(master, text="Realizar Autoevaluación", command=self.self_evaluation)
-        self.self_evaluation_button.pack()
-
-        self.manager_evaluation_button = tk.Button(master, text="Evaluar Empleado", command=self.manager_evaluation)
-        self.manager_evaluation_button.pack()
-
-        self.previous_evaluations_button = tk.Button(master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations)
-        self.previous_evaluations_button.pack()
-
-        self.report_button = tk.Button(master, text="Generar Reporte de Desempeño", command=self.generate_report)
-        self.report_button.pack()
+        # Pantalla de inicio de sesión
+        self.login_screen()  
 
     def connect_db(self):
         """Conectar a la base de datos MariaDB."""
         try:
-            # Cambia estos valores por tus credenciales
             self.conn = mariadb.connect(
                 user="root",
-                password="suser",
-                host="localhost",
+                password="28marzo2005",
+                host="127.0.0.1",
                 port=3306,
                 database="evaluaciones"
             )
@@ -54,22 +32,106 @@ class EmployeeEvaluationApp:
             print(f"Error al conectar a la base de datos: {e}")
             sys.exit(1)
 
-    def save_criteria(self):
-        role = self.role_entry.get()
-        criteria = self.criteria_entry.get().split(',')
+    def clear_window(self):
+        """Limpiar la ventana actual."""
+        for widget in self.master.winfo_children():
+            widget.destroy()
 
-        if role and criteria:
-            criteria_str = ', '.join(criteria)
-            try:
-                # Inserta los criterios en la tabla
-                self.cursor.execute("INSERT INTO evaluaciones (rol, criterios) VALUES (?, ?)", (role, criteria_str))
-                self.conn.commit()
-                messagebox.showinfo("Criterios Guardados", f"Criterios para {role}: {criteria_str}")
-                # Limpiar entradas después de guardar
-                self.role_entry.delete(0, tk.END)
-                self.criteria_entry.delete(0, tk.END)
-            except mariadb.Error as e:
-                messagebox.showerror("Error", f"No se pudieron guardar los criterios: {e}")
+    def login_screen(self):
+        """Crear la pantalla de inicio de sesión."""
+        self.clear_window()
+
+        # Establecer un fondo claro para toda la ventana
+        self.master.configure(bg="#e8d5ea")  # Fondo morado claro
+
+        # Frame principal para centrar todo el contenido, con un relleno inferior para subir los elementos
+        main_frame = tk.Frame(self.master, bg="#e8d5ea")
+        main_frame.pack(expand=True, pady=(20, 80))  
+
+        # Único título con color oscuro y centrado
+        title_label = tk.Label(
+            main_frame,
+            text="Bienvenido",
+            font=("Arial", 28, "bold"),
+            bg="#e8d5ea",
+            fg="#6a1b9a"  # Color oscuro para el título
+        )
+        title_label.pack(pady=(20, 15)) 
+
+        # Frame para centrar y contener los campos de entrada
+        frame = tk.Frame(main_frame, bg="#e8d5ea", bd=5, relief=tk.RAISED)  
+        frame.pack(pady=10, padx=20)
+
+        # Etiqueta y entrada para el usuario
+        tk.Label(frame, text="Usuario:", font=("Arial", 14), bg="#e8d5ea", fg="#4a148c").grid(row=0, column=0, sticky='w', padx=(0, 10))
+        self.username_entry = tk.Entry(frame, font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
+        self.username_entry.grid(row=0, column=1)
+        self.username_entry.bind("<FocusIn>", lambda e: self.username_entry.configure(bg="#e0f7fa"))  
+        self.username_entry.bind("<FocusOut>", lambda e: self.username_entry.configure(bg="#ffffff"))  
+
+        # Etiqueta y entrada para la contraseña
+        tk.Label(frame, text="Contraseña:", font=("Arial", 14), bg="#e8d5ea", fg="#4a148c").grid(row=1, column=0, sticky='w', padx=(0, 10))
+        self.password_entry = tk.Entry(frame, show='*', font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
+        self.password_entry.grid(row=1, column=1)
+        self.password_entry.bind("<FocusIn>", lambda e: self.password_entry.configure(bg="#e0f7fa"))  
+        self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))  
+
+        # Botón de inicio de sesión con efecto hover
+        login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login, bg="#8e24aa", fg="white", font=("Arial", 14, "bold"), bd=0, activebackground="#9c27b0", activeforeground="white")
+        login_button.pack(pady=(15, 0)) 
+
+        # Efecto hover para el botón
+        login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
+        login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))  
+
+    def login(self):
+        """Verificar credenciales y mostrar la interfaz correspondiente."""
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        # Aquí deberías agregar la lógica para verificar las credenciales
+        try:
+            self.cursor.execute("SELECT rol FROM usuarios WHERE nombre_usuario=? AND contrasena=?", (username, password))
+            result = self.cursor.fetchone()
+
+            if result:
+                role = result[0]
+                if role == "gerente":
+                    self.show_manager_interface()
+                else:
+                    self.show_employee_interface()
+            else:
+                messagebox.showerror("Error", "Credenciales incorrectas. Intenta nuevamente.")
+        
+        except mariadb.Error as e:
+            messagebox.showerror("Error", f"No se pudo verificar las credenciales: {e}")
+
+    def show_manager_interface(self):
+        """Mostrar la interfaz del gerente."""
+        self.clear_window()
+        
+        tk.Label(self.master, text="Bienvenido Gerente", font=("Arial", 18), bg="#f0f4f7").pack(pady=20)
+
+        tk.Button(self.master, text="Evaluar Empleado", command=self.manager_evaluation, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Comparar Desempeño de Empleados", command=self.compare_performance, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Generar Reporte de Desempeño", command=self.generate_report, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+
+        tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
+
+
+    def show_employee_interface(self):
+        """Mostrar la interfaz del empleado."""
+        self.clear_window()
+        
+        tk.Label(self.master, text="Bienvenido Empleado", font=("Arial", 18), bg="#f0f4f7").pack(pady=20)
+
+        tk.Button(self.master, text="Realizar Autoevaluación", command=self.self_evaluation, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+
+        tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
+
 
     def self_evaluation(self):
         questions = {
@@ -102,7 +164,12 @@ class EmployeeEvaluationApp:
             messagebox.showinfo("Autoevaluación", f"Categoría: {category}")
             for question in qs:
                 response = simpledialog.askinteger("Autoevaluación", f"{question}\n(1: Malo, 5: Excelente)", minvalue=1, maxvalue=5)
-                responses.append(response)
+                if response is not None:
+                    responses.append(response)
+
+        if not responses:
+            messagebox.showwarning("Advertencia", "No se realizaron respuestas a la autoevaluación.")
+            return
 
         average_score = sum(responses) / len(responses)
         
@@ -110,18 +177,18 @@ class EmployeeEvaluationApp:
         
         if employee_name:
             try:
-                # Guardar autoevaluación en formato JSON
                 autoeval_json = str(responses)
 
-                # Insertar autoevaluación en la base de datos
-                self.cursor.execute("UPDATE evaluaciones SET autoevaluacion=? WHERE nombre_empleado=?", (autoeval_json, employee_name))
+                self.cursor.execute("INSERT INTO evaluaciones (nombre_empleado, rol, autoevaluacion) VALUES (?, ?, ?)", 
+                                    (employee_name, 'Empleado', autoeval_json))
                 
-                # Commit a la base de datos
                 self.conn.commit()
                 
                 messagebox.showinfo("Resultados de Autoevaluación", f"Tu puntuación promedio es: {average_score:.2f}")
             except mariadb.Error as e:
                 messagebox.showerror("Error", f"No se pudo guardar la autoevaluación: {e}")
+        else:
+            messagebox.showwarning("Advertencia", "Nombre de empleado no ingresado.")
 
     def manager_evaluation(self):
         employee_name = simpledialog.askstring("Nombre del Empleado", "Ingresa el nombre del empleado a evaluar:")
@@ -139,67 +206,152 @@ class EmployeeEvaluationApp:
             
             for question in questions:
                 response = simpledialog.askinteger("Evaluación del Empleado", f"{question}\n(1: Malo, 5: Excelente)", minvalue=1, maxvalue=5)
-                responses.append(response)
+                if response is not None:
+                    responses.append(response)
+
+            if not responses:
+                messagebox.showwarning("Advertencia", "No se realizaron respuestas a la evaluación del empleado.")
+                return
 
             average_score = sum(responses) / len(responses)
 
             try:
-                # Guardar evaluación del gerente en formato JSON
                 manager_eval_json = str(responses)
 
-                # Insertar evaluación del gerente en la base de datos
-                self.cursor.execute("UPDATE evaluaciones SET evaluacion_gerente=? WHERE nombre_empleado=?", (manager_eval_json, employee_name))
+                self.cursor.execute("UPDATE evaluaciones SET evaluacion_gerente=? WHERE nombre_empleado=?", 
+                                    (manager_eval_json, employee_name))
                 
-                # Commit a la base de datos
                 self.conn.commit()
                 
                 messagebox.showinfo("Resultados de Evaluación", f"La puntuación promedio del empleado {employee_name} es: {average_score:.2f}")
             except mariadb.Error as e:
                 messagebox.showerror("Error", f"No se pudo guardar la evaluación del gerente: {e}")
+        else:
+            messagebox.showwarning("Advertencia", "Nombre de empleado no ingresado.")
 
     def view_previous_evaluations(self):
         employee_name = simpledialog.askstring("Nombre del Empleado", "Ingresa tu nombre:")
         
         if employee_name:
             try:
-                # Consultar evaluaciones anteriores desde la base de datos
                 self.cursor.execute("SELECT autoevaluacion, evaluacion_gerente FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
-                
                 result = self.cursor.fetchone()
                 
                 if result:
+                    autoeval = eval(result[0])
+                    manager_eval = eval(result[1]) if result[1] else []
+
                     evaluations_text = f"Evaluaciones anteriores para {employee_name}:\n\n"
-                    evaluations_text += f"Autoevaluación: {result[0]}\n"
-                    evaluations_text += f"Evaluación por Gerente: {result[1]}\n"
+                    evaluations_text += "Autoevaluación:\n"
+                    for i, score in enumerate(autoeval, 1):
+                        evaluations_text += f"{i}. Pregunta {i}: {score}\n"
+                    
+                    evaluations_text += "\nEvaluación por Gerente:\n"
+                    for i, score in enumerate(manager_eval, 1):
+                        evaluations_text += f"{i}. Pregunta {i}: {score}\n"
+                    
                     messagebox.showinfo("Evaluaciones Anteriores", evaluations_text.strip())
-                    return
+                else:
+                    messagebox.showinfo("Evaluaciones Anteriores", f"No se encontraron evaluaciones para {employee_name}.")
                 
             except mariadb.Error as e:
-               messagebox.showerror("Error", f"No se pudieron recuperar las evaluaciones: {e}")
+                messagebox.showerror("Error", f"No se pudieron recuperar las evaluaciones: {e}")
+
+    def compare_performance(self):
+        employees_to_compare = simpledialog.askstring("Comparar Desempeño", 
+                                                    "Ingresa los nombres de los empleados separados por comas:")
+        
+        if employees_to_compare:
+            employee_list = [name.strip() for name in employees_to_compare.split(',')]
+            
+            report_text = "Comparativa de Desempeño:\n\n"
+            overall_scores = {}
+
+            for employee in employee_list:
+                try:
+                    self.cursor.execute("SELECT autoevaluacion FROM evaluaciones WHERE nombre_empleado=?", (employee,))
+                    result = self.cursor.fetchone()
+                    
+                    if result:
+                        autoeval = eval(result[0])  # Convertir JSON a lista
+                        report_text += f"Empleado: {employee}\n"
+                        report_text += "Autoevaluación:\n"
+                        for i, score in enumerate(autoeval, 1):
+                            report_text += f"  Pregunta {i}: {score}\n"
+                        
+                        # Calcular y almacenar el promedio
+                        average_score = sum(autoeval) / len(autoeval)
+                        report_text += f"  Promedio Autoevaluación: {average_score:.2f}\n"
+                        overall_scores[employee] = average_score
+                    else:
+                        report_text += f"Empleado: {employee} no encontrado.\n\n"
+                    
+                except mariadb.Error as e:
+                    messagebox.showerror("Error", f"No se pudo recuperar las evaluaciones para {employee}: {e}")
+            
+            compare_window = tk.Toplevel(self.master)
+            compare_window.title("Comparativa de Desempeño")
+            compare_window.focus_force()
+
+            compare_text_area = scrolledtext.ScrolledText(compare_window, width=70, height=20)
+            compare_text_area.insert(tk.END, report_text.strip())
+            compare_text_area.pack(padx=10, pady=10)
+
+            if overall_scores:
+                sorted_scores = sorted(overall_scores.items(), key=lambda x: x[1], reverse=True)
+                compare_text_area.insert(tk.END, "\nRanking de Empleados:\n")
+                for rank, (emp, score) in enumerate(sorted_scores, start=1):
+                    compare_text_area.insert(tk.END, f"{rank}. {emp}: {score:.2f}\n")
+
+            tk.Button(compare_window, text="Cerrar", command=compare_window.destroy).pack(pady=5)
 
     def generate_report(self):
         report_text = "Reporte de Desempeño General:\n\n"
         
         try:
-            # Consultar todas las evaluaciones desde la base de datos
             self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
             
             for row in self.cursor.fetchall():
-              report_text += f"Empleado: {row[0]}\n"
-              report_text += f"Autoevaluación: {row[1]}\n"
-              report_text += f"Evaluación por Gerente: {row[2]}\n\n"
+                report_text += f"Empleado: {row[0]}\n"
+                
+                # Procesar autoevaluación
+                autoeval = eval(row[1])  # Convertir JSON a lista
+                report_text += "Autoevaluación:\n"
+                for i, score in enumerate(autoeval, 1):
+                    report_text += f"  Pregunta {i}: {score}\n"
+                    
+                # Procesar evaluación por gerente
+                if row[2]:
+                    manager_eval = eval(row[2])
+                    report_text += "Evaluación por Gerente:\n"
+                    for i, score in enumerate(manager_eval, 1):
+                        report_text += f"  Pregunta {i}: {score}\n"
+                else:
+                    report_text += "Evaluación por Gerente: No disponible\n"
+                
+                # Calcular y agregar puntajes promedio
+                average_auto = sum(autoeval) / len(autoeval) if autoeval else 0
+                average_manager = sum(manager_eval) / len(manager_eval) if manager_eval else 0
+                
+                report_text += f"  Promedio Autoevaluación: {average_auto:.2f}\n"
+                report_text += f"  Promedio Evaluación Gerente: {average_manager:.2f}\n"
+                report_text += "-" * 50 + "\n"  # Separator for better readability
 
-          # Mostrar reporte en una ventana nueva
+            # Mostrar reporte en una ventana nueva
             report_window = tk.Toplevel(self.master)
             report_window.title("Reporte de Desempeño")
-          
-            report_text_area = scrolledtext.ScrolledText(report_window, width=50, height=20)
+            report_window.focus_force()
+
+            report_text_area = scrolledtext.ScrolledText(report_window, width=70, height=20)
             report_text_area.insert(tk.END, report_text.strip())
-          
-            report_text_area.pack()
-          
+            report_text_area.pack(padx=10, pady=10)
+            
+            # Add a button to close the report window
+            tk.Button(report_window, text="Cerrar", command=report_window.destroy).pack(pady=5)
+        
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo generar el reporte: {e}")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
