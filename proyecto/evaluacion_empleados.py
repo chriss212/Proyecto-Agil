@@ -43,8 +43,8 @@ class EmployeeEvaluationApp:
             # Cambia estos valores por tus credenciales
             self.conn = mariadb.connect(
                 user="root",
-                password="suser",
-                host="localhost",
+                password="28marzo2005",
+                host="127.0.0.1",
                 port=3306,
                 database="evaluaciones"
             )
