@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog, scrolledtext
+from tkinter import messagebox
 import mariadb
 import sys
 
@@ -9,12 +9,12 @@ class EmployeeEvaluationApp:
         master.title("Evaluación del Desempeño de Empleados")
         master.geometry("400x400")
         master.configure(bg="#f0f4f7")
-        
+
         # Conexión a la base de datos
         self.connect_db()
-        
+
         # Pantalla de inicio de sesión
-        self.login_screen()
+        self.login_screen()  
 
     def connect_db(self):
         """Conectar a la base de datos MariaDB."""
@@ -32,32 +32,63 @@ class EmployeeEvaluationApp:
             print(f"Error al conectar a la base de datos: {e}")
             sys.exit(1)
 
-    def login_screen(self):
-        """Crear la pantalla de inicio de sesión."""
-        self.clear_window()
-
-        tk.Label(self.master, text="Iniciar Sesión", font=("Arial", 18), bg="#f0f4f7").pack(pady=20)
-
-        tk.Label(self.master, text="Usuario:", font=("Arial", 12), bg="#f0f4f7").pack()
-        self.username_entry = tk.Entry(self.master, font=("Arial", 12))
-        self.username_entry.pack(pady=5)
-
-        tk.Label(self.master, text="Contraseña:", font=("Arial", 12), bg="#f0f4f7").pack()
-        self.password_entry = tk.Entry(self.master, show='*', font=("Arial", 12))
-        self.password_entry.pack(pady=5)
-
-        tk.Button(self.master, text="Iniciar Sesión", command=self.login, bg="#5cb85c", fg="white", font=("Arial", 12)).pack(pady=20)
-
     def clear_window(self):
         """Limpiar la ventana actual."""
         for widget in self.master.winfo_children():
             widget.destroy()
 
+    def login_screen(self):
+        """Crear la pantalla de inicio de sesión."""
+        self.clear_window()
+
+        # Establecer un fondo claro para toda la ventana
+        self.master.configure(bg="#e8d5ea")  # Fondo morado claro
+
+        # Frame principal para centrar todo el contenido, con un relleno inferior para subir los elementos
+        main_frame = tk.Frame(self.master, bg="#e8d5ea")
+        main_frame.pack(expand=True, pady=(20, 80))  
+
+        # Único título con color oscuro y centrado
+        title_label = tk.Label(
+            main_frame,
+            text="Bienvenido",
+            font=("Arial", 28, "bold"),
+            bg="#e8d5ea",
+            fg="#6a1b9a"  # Color oscuro para el título
+        )
+        title_label.pack(pady=(20, 15)) 
+
+        # Frame para centrar y contener los campos de entrada
+        frame = tk.Frame(main_frame, bg="#e8d5ea", bd=5, relief=tk.RAISED)  
+        frame.pack(pady=10, padx=20)
+
+        # Etiqueta y entrada para el usuario
+        tk.Label(frame, text="Usuario:", font=("Arial", 14), bg="#e8d5ea", fg="#4a148c").grid(row=0, column=0, sticky='w', padx=(0, 10))
+        self.username_entry = tk.Entry(frame, font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
+        self.username_entry.grid(row=0, column=1)
+        self.username_entry.bind("<FocusIn>", lambda e: self.username_entry.configure(bg="#e0f7fa"))  
+        self.username_entry.bind("<FocusOut>", lambda e: self.username_entry.configure(bg="#ffffff"))  
+
+        # Etiqueta y entrada para la contraseña
+        tk.Label(frame, text="Contraseña:", font=("Arial", 14), bg="#e8d5ea", fg="#4a148c").grid(row=1, column=0, sticky='w', padx=(0, 10))
+        self.password_entry = tk.Entry(frame, show='*', font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
+        self.password_entry.grid(row=1, column=1)
+        self.password_entry.bind("<FocusIn>", lambda e: self.password_entry.configure(bg="#e0f7fa"))  
+        self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))  
+
+        # Botón de inicio de sesión con efecto hover
+        login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login, bg="#8e24aa", fg="white", font=("Arial", 14, "bold"), bd=0, activebackground="#9c27b0", activeforeground="white")
+        login_button.pack(pady=(15, 0)) 
+
+        # Efecto hover para el botón
+        login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
+        login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))  
+
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
         username = self.username_entry.get()
         password = self.password_entry.get()
-
+        # Aquí deberías agregar la lógica para verificar las credenciales
         try:
             self.cursor.execute("SELECT rol FROM usuarios WHERE nombre_usuario=? AND contrasena=?", (username, password))
             result = self.cursor.fetchone()
