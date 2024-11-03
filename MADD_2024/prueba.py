@@ -18,7 +18,6 @@ class EmployeeEvaluationApp:
     def connect_db(self):
         """Conectar a la base de datos MariaDB."""
         try:
-            # Cambia estos valores por tus credenciales
             self.conn = mariadb.connect(
                 user="root",
                 password="suser",
@@ -48,6 +47,8 @@ class EmployeeEvaluationApp:
 
         tk.Button(self.master, text="Iniciar Sesión", command=self.login).pack(pady=20)
 
+        tk.Button(self.master, text="Crear Cuenta", command=self.create_account).pack(pady=5)
+
     def clear_window(self):
         """Limpiar la ventana actual."""
         for widget in self.master.winfo_children():
@@ -59,7 +60,6 @@ class EmployeeEvaluationApp:
         password = self.password_entry.get()
 
         try:
-            # Consultar las credenciales desde la base de datos
             self.cursor.execute("SELECT rol FROM usuarios WHERE nombre_usuario=? AND contrasena=?", (username, password))
             result = self.cursor.fetchone()
 
@@ -81,17 +81,12 @@ class EmployeeEvaluationApp:
         
         tk.Label(self.master, text="Bienvenido Gerente", font=("Arial", 16)).pack(pady=20)
 
-        self.manager_evaluation_button = tk.Button(self.master, text="Evaluar Empleado", command=self.manager_evaluation)
-        self.manager_evaluation_button.pack(pady=5)
-
-        self.previous_evaluations_button = tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations)
-        self.previous_evaluations_button.pack(pady=5)
-
-        self.compare_performance_button = tk.Button(self.master, text="Comparar Desempeño de Empleados", command=self.compare_performance)
-        self.compare_performance_button.pack(pady=5)
-
-        self.report_button = tk.Button(self.master, text="Generar Reporte de Desempeño", command=self.generate_report)
-        self.report_button.pack(pady=5)
+        tk.Button(self.master, text="Evaluar Empleado", command=self.manager_evaluation).pack(pady=5)
+        tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations).pack(pady=5)
+        tk.Button(self.master, text="Comparar Desempeño de Empleados", command=self.compare_performance).pack(pady=5)
+        tk.Button(self.master, text="Generar Reporte de Desempeño", command=self.generate_report).pack(pady=5)
+        tk.Button(self.master, text="Administrar Cuentas", command=self.manage_accounts).pack(pady=5)
+        tk.Button(self.master, text="Ver Todas las Cuentas", command=self.view_accounts).pack(pady=5)
 
     def show_employee_interface(self):
         """Mostrar la interfaz del empleado."""
@@ -99,11 +94,8 @@ class EmployeeEvaluationApp:
         
         tk.Label(self.master, text="Bienvenido Empleado", font=("Arial", 16)).pack(pady=20)
 
-        self.self_evaluation_button = tk.Button(self.master, text="Realizar Autoevaluación", command=self.self_evaluation)
-        self.self_evaluation_button.pack(pady=5)
-
-        self.previous_evaluations_button = tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations)
-        self.previous_evaluations_button.pack(pady=5)
+        tk.Button(self.master, text="Realizar Autoevaluación", command=self.self_evaluation).pack(pady=5)
+        tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations).pack(pady=5)
 
     def self_evaluation(self):
         questions = {
@@ -149,14 +141,10 @@ class EmployeeEvaluationApp:
         
         if employee_name:
             try:
-                # Guardar autoevaluación en formato JSON
                 autoeval_json = str(responses)
 
-                # Insertar autoevaluación en la base de datos
                 self.cursor.execute("INSERT INTO evaluaciones (nombre_empleado, rol, autoevaluacion) VALUES (?, ?, ?)", 
                                     (employee_name, 'Empleado', autoeval_json))
-                
-                # Commit a la base de datos
                 self.conn.commit()
                 
                 messagebox.showinfo("Resultados de Autoevaluación", f"Tu puntuación promedio es: {average_score:.2f}")
@@ -198,14 +186,10 @@ class EmployeeEvaluationApp:
             average_score = sum(responses) / len(responses)
 
             try:
-                # Guardar evaluación del gerente en formato JSON
                 manager_eval_json = str(responses)
 
-                # Insertar evaluación del gerente en la base de datos
                 self.cursor.execute("UPDATE evaluaciones SET evaluacion_gerente=? WHERE nombre_empleado=?", 
                                     (manager_eval_json, employee_name))
-                
-                # Commit a la base de datos
                 self.conn.commit()
                 
                 messagebox.showinfo("Resultados de Evaluación", f"La puntuación promedio del empleado {employee_name} es: {average_score:.2f}")
@@ -220,79 +204,95 @@ class EmployeeEvaluationApp:
         tk.Label(self.master, text="Evaluaciones Anteriores", font=("Arial", 16)).pack(pady=20)
 
         try:
-            # Obtener todas las evaluaciones
             self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
             evaluations = self.cursor.fetchall()
 
-            for eval in evaluations:
-                emp_name, self_eval, mgr_eval = eval
-                tk.Label(self.master, text=f"Empleado: {emp_name}", font=("Arial", 14)).pack()
-                tk.Label(self.master, text=f"Autoevaluación: {self_eval}", font=("Arial", 12)).pack()
-                tk.Label(self.master, text=f"Evaluación del Gerente: {mgr_eval}", font=("Arial", 12)).pack()
-                tk.Label(self.master, text="").pack()  # Espaciado
-
+            for emp_name, self_eval, mgr_eval in evaluations:
+                tk.Label(self.master, text=f"Empleado: {emp_name}").pack()
+                tk.Label(self.master, text=f"Autoevaluación: {self_eval}").pack()
+                tk.Label(self.master, text=f"Evaluación del Gerente: {mgr_eval if mgr_eval else 'No disponible'}").pack()
+                tk.Label(self.master, text="").pack()  # Espacio en blanco
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo obtener las evaluaciones: {e}")
+
+        tk.Button(self.master, text="Volver", command=self.login_screen).pack(pady=20)
 
     def compare_performance(self):
-        self.clear_window()
-        
-        tk.Label(self.master, text="Comparar Desempeño de Empleados", font=("Arial", 16)).pack(pady=20)
-
-        try:
-            self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
-            evaluations = self.cursor.fetchall()
-
-            if evaluations:
-                for eval in evaluations:
-                    emp_name, self_eval, mgr_eval = eval
-                    tk.Label(self.master, text=f"Empleado: {emp_name}", font=("Arial", 14)).pack()
-                    tk.Label(self.master, text=f"Autoevaluación: {self_eval}", font=("Arial", 12)).pack()
-                    tk.Label(self.master, text=f"Evaluación del Gerente: {mgr_eval}", font=("Arial", 12)).pack()
-                    tk.Label(self.master, text="").pack()  # Espaciado
-
-            else:
-                tk.Label(self.master, text="No hay evaluaciones para mostrar.", font=("Arial", 12)).pack()
-
-        except mariadb.Error as e:
-            messagebox.showerror("Error", f"No se pudo obtener las evaluaciones: {e}")
+        # Lógica para comparar desempeño de empleados
+        messagebox.showinfo("Comparar Desempeño", "Funcionalidad en desarrollo.")
 
     def generate_report(self):
+        # Lógica para generar reportes
+        messagebox.showinfo("Generar Reporte", "Funcionalidad en desarrollo.")
+
+    def manage_accounts(self):
+        self.clear_window()
+
+        tk.Label(self.master, text="Administrar Cuentas", font=("Arial", 16)).pack(pady=20)
+
+        tk.Button(self.master, text="Crear Nueva Cuenta", command=self.create_account).pack(pady=5)
+        tk.Button(self.master, text="Editar Cuenta Existente", command=self.edit_account).pack(pady=5)
+        tk.Button(self.master, text="Ver Todas las Cuentas", command=self.view_accounts).pack(pady=5)
+
+        tk.Button(self.master, text="Volver", command=self.login_screen).pack(pady=20)
+
+    def create_account(self):
+        new_username = simpledialog.askstring("Crear Cuenta", "Ingresa el nombre de usuario:")
+        new_password = simpledialog.askstring("Crear Cuenta", "Ingresa la contraseña:", show='*')
+        new_role = simpledialog.askstring("Crear Cuenta", "Ingresa el rol (gerente/empleado):")
+
+        if new_username and new_password and new_role in ['gerente', 'empleado']:
+            try:
+                self.cursor.execute("INSERT INTO usuarios (nombre_usuario, contrasena, rol) VALUES (?, ?, ?)", 
+                                    (new_username, new_password, new_role))
+                self.conn.commit()
+                messagebox.showinfo("Éxito", f"Cuenta {new_username} creada exitosamente.")
+            except mariadb.Error as e:
+                messagebox.showerror("Error", f"No se pudo crear la cuenta: {e}")
+        else:
+            messagebox.showwarning("Advertencia", "Por favor ingresa todos los campos correctamente.")
+
+    def edit_account(self):
+        username_to_edit = simpledialog.askstring("Editar Cuenta", "Ingresa el nombre de usuario de la cuenta a editar:")
+        
+        if username_to_edit:
+            new_password = simpledialog.askstring("Editar Cuenta", "Ingresa la nueva contraseña:", show='*')
+            new_role = simpledialog.askstring("Editar Cuenta", "Ingresa el nuevo rol (gerente/empleado):")
+
+            if new_password and new_role in ['gerente', 'empleado']:
+                try:
+                    self.cursor.execute("UPDATE usuarios SET contrasena=?, rol=? WHERE nombre_usuario=?", 
+                                        (new_password, new_role, username_to_edit))
+                    self.conn.commit()
+                    messagebox.showinfo("Éxito", f"Cuenta {username_to_edit} editada exitosamente.")
+                except mariadb.Error as e:
+                    messagebox.showerror("Error", f"No se pudo editar la cuenta: {e}")
+            else:
+                messagebox.showwarning("Advertencia", "Por favor ingresa todos los campos correctamente.")
+        else:
+            messagebox.showwarning("Advertencia", "Nombre de usuario no ingresado.")
+
+    def view_accounts(self):
+        """Mostrar todas las cuentas existentes."""
         self.clear_window()
         
-        tk.Label(self.master, text="Generar Reporte de Desempeño", font=("Arial", 16)).pack(pady=20)
+        tk.Label(self.master, text="Cuentas Existentes", font=("Arial", 16)).pack(pady=20)
 
         try:
-            self.cursor.execute("SELECT nombre_empleado, autoevaluacion, evaluacion_gerente FROM evaluaciones")
-            evaluations = self.cursor.fetchall()
+            self.cursor.execute("SELECT nombre_usuario, rol FROM usuarios")
+            accounts = self.cursor.fetchall()
 
-            report_text = "Reporte de Desempeño:\n\n"
-            for eval in evaluations:
-                emp_name, self_eval, mgr_eval = eval
-                report_text += f"Empleado: {emp_name}\nAutoevaluación: {self_eval}\nEvaluación del Gerente: {mgr_eval}\n\n"
-
-            report_window = tk.Toplevel(self.master)
-            report_window.title("Reporte de Desempeño")
-            report_window.geometry("800x600")  # Ventana de tamaño 800x600
-
-            text_area = scrolledtext.ScrolledText(report_window, wrap=tk.WORD)
-            text_area.pack(expand=True, fill='both')
-            text_area.insert(tk.INSERT, report_text)
-            text_area.config(state=tk.DISABLED)  # Hacer el área de texto solo lectura
-
-            tk.Button(report_window, text="Cerrar", command=report_window.destroy).pack(pady=5)
-
+            if accounts:
+                for username, role in accounts:
+                    tk.Label(self.master, text=f"Usuario: {username}, Rol: {role}").pack()
+            else:
+                tk.Label(self.master, text="No hay cuentas registradas.").pack()
         except mariadb.Error as e:
-            messagebox.showerror("Error", f"No se pudo generar el reporte: {e}")
+            messagebox.showerror("Error", f"No se pudo obtener las cuentas: {e}")
 
-    def close_app(self):
-        """Cerrar la aplicación."""
-        self.conn.close()  # Cerrar conexión a la base de datos
-        self.master.quit()
-
+        tk.Button(self.master, text="Volver", command=self.manage_accounts).pack(pady=20)
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = EmployeeEvaluationApp(root)
-    root.protocol("WM_DELETE_WINDOW", app.close_app)  # Manejar el cierre de la ventana
     root.mainloop()
