@@ -385,6 +385,7 @@ class EmployeeEvaluationApp:
                  
                  for i, score in enumerate(autoeval,1):
                     report_text += f" Pregunta {i}: {score}\n"
+<<<<<<< Updated upstream
 
                  # Procesar evaluación por gerente
                  if row[2]:
@@ -400,6 +401,113 @@ class EmployeeEvaluationApp:
                  # Calcular y agregar puntajes promedio
                  average_auto = sum(autoeval) / len(autoeval) if autoeval else 0
                  average_manager = sum(manager_eval) / len(manager_eval) if manager_eval else 0
+=======
+
+                 # Procesar evaluación por gerente
+                 if row[2]:
+                     manager_eval = eval(row[2])
+                     report_text += "Evaluación por Gerente:\n"
+                     
+                     for i, score in enumerate(manager_eval, 1):
+                         report_text += f" Pregunta {i}: {score}\n"
+                 else:
+                     report_text += \
+                         "Evaluación por Gerente: No disponible\n"
+
+                 # Calcular y agregar puntajes promedio
+                 average_auto = sum(autoeval) / len(autoeval) if autoeval else 0
+                 average_manager = sum(manager_eval) / len(manager_eval) if manager_eval else 0
+
+                 report_text += \
+                     f" Promedio Autoevaluación: {average_auto:.2f}\n"
+                 report_text += \
+                     f" Promedio Evaluación Gerente: {average_manager:.2f}\n"
+
+                 report_text += "-" * 50 + "\n" # Separator for better readability
+
+             # Mostrar reporte en una ventana nueva
+             report_window = tk.Toplevel(self.master)
+
+             report_window.title("Reporte de Desempeño")
+
+             #Color de la ventana
+             report_window.configure(bg="#432c81")
+             
+             report_window.focus_force()
+
+             report_text_area = scrolledtext.ScrolledText(report_window,
+                                            width=70,
+                                            height=20)
+
+             report_text_area.insert(tk.END,
+                                     report_text.strip())
+             
+             report_text_area.pack(padx=10,
+                                   pady=10)
+
+             # Add a button to close the report window
+             tk.Button(report_window,
+                       text="Cerrar",
+                       command=report_window.destroy,
+                       bg="#625b71",  # Color de fondo del botón
+                       fg="#ffffff"
+                       ).pack(pady=5)
+
+         except mariadb.Error as e:
+             messagebox.showerror("Error",
+                                  f"No se pudo generar el reporte: {e}")
+
+    def add_feedback(self):
+        """Función para añadir comentarios de feedback para un empleado."""
+        employee_name = simpledialog.askstring("Feedback", "Ingresa el nombre del empleado para darle feedback:")
+        if employee_name:
+            feedback = simpledialog.askstring("Feedback", "Escribe tus comentarios:")
+            if feedback:
+                try:
+                    # Verificar si el empleado existe en la tabla evaluaciones
+                    self.cursor.execute("SELECT id FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
+                    result = self.cursor.fetchone()
+                    
+                    if result:
+                        employee_id = result[0]
+                        # Insertar o actualizar feedback en la base de datos
+                        self.cursor.execute("UPDATE evaluaciones SET feedback=? WHERE id=?", (feedback, employee_id))
+                        self.conn.commit()
+                        messagebox.showinfo("Feedback", f"Feedback agregado para {employee_name}.")
+                    else:
+                        messagebox.showwarning("Advertencia", f"No se encontró un empleado con el nombre: {employee_name}.")
+                    
+                except mariadb.Error as e:
+                    messagebox.showerror("Error", f"No se pudo añadir el feedback: {e}")
+            else:
+                messagebox.showwarning("Advertencia", "El campo de feedback está vacío.")
+        else:
+            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
+
+    def view_feedback(self):
+        """Función para que los empleados vean su feedback."""
+        employee_name = simpledialog.askstring("Ver Feedback", "Ingresa tu nombre:")
+        
+        if employee_name:
+            try:
+                # Buscar el feedback del empleado en la base de datos
+                self.cursor.execute("SELECT feedback FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
+                result = self.cursor.fetchone()
+                
+                if result and result[0]:
+                    feedback = result[0]
+                    messagebox.showinfo("Feedback", f"Feedback para {employee_name}:\n\n{feedback}")
+                else:
+                    messagebox.showinfo("Feedback", f"No se encontró feedback para el empleado: {employee_name}.")
+                    
+            except mariadb.Error as e:
+                messagebox.showerror("Error", f"No se pudo recuperar el feedback: {e}")
+        else:
+            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
+       
+
+
+>>>>>>> Stashed changes
 
                  report_text += \
                      f" Promedio Autoevaluación: {average_auto:.2f}\n"
