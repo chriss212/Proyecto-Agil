@@ -96,6 +96,59 @@ class EmployeeEvaluationApp:
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo verificar las credenciales: {e}")
 
+<<<<<<< Updated upstream
+=======
+    def show_manager_interface(self):
+        """Mostrar la interfaz del gerente con barra lateral y tarjetas."""
+        self.clear_window()
+
+        # Barra lateral para el gerente
+        sidebar = tk.Frame(self.master, bg="#4A148C", width=200)
+        sidebar.pack(side="left", fill="y")
+
+        # Título del sistema
+        tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))
+        tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack(pady=(0, 100))
+
+        # Botones de la barra lateral para el gerente
+        buttons = [("Home", "🏠"), ("Evaluaciones", "📊"), ("Reportes", "📁")]
+        for text, icon in buttons:
+            button = tk.Button(sidebar, text=f"{icon}  {text}", font=("Arial", 12), bg="#4A148C", fg="white", borderwidth=0)
+            button.pack(fill="x", pady=20, padx=20)
+
+        # Botón de cerrar sesión
+        tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A148", fg="white", borderwidth=0,
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)
+
+        # Frame principal de la interfaz del gerente
+        main_frame = tk.Frame(self.master, bg="#f0f4f7")
+        main_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
+
+        # Saludo al gerente
+        tk.Label(main_frame, text="Bienvenido, gerente 👔 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
+
+        # Tarjetas de evaluación en una disposición vertical
+        card_data = [
+            ("Evaluar empleado", "Evaluación de Desempeño", "Evalúa el desempeño de un empleado en varias áreas clave.", self.evaluate_employee),
+            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de evaluaciones realizadas.", self.view_previous_evaluations),
+            ("Comparar desempeño de empleados", "Comparativa de Desempeño", "Compara el desempeño de varios empleados.", self.compare_employee_performance),
+            ("Generar reporte de desempeño", "Reportes de Desempeño", "Genera reportes detallados del desempeño de los empleados.", self.generate_performance_report),
+            ("Añadir feedback", "Feedback para Empleados", "Proporciona retroalimentación a los empleados sobre su desempeño.", self.add_feedback)
+        ]
+
+        for title, subtitle, description, command in card_data:
+            # Crear cada tarjeta con el mismo tamaño y estilo
+            card = tk.Frame(main_frame, bg="white", bd=1, relief="solid")
+            card.pack(pady=10, fill="x", padx=10)
+
+            # Agregar icono, título, subtítulo, descripción y botón a cada tarjeta
+            tk.Label(card, text="📋", font=("Arial", 18, "bold"), bg="white", fg="#4A148C").grid(row=0, column=0, padx=10, pady=5, sticky="nw")
+            tk.Label(card, text=title, font=("Arial", 16, "bold"), bg="white", fg="#4A148C").grid(row=0, column=1, sticky="w", pady=5)
+            tk.Label(card, text=subtitle, font=("Arial", 12), bg="white", fg="#757575").grid(row=1, column=1, sticky="w", padx=10)
+            tk.Label(card, text=description, font=("Arial", 10), bg="white", fg="#757575", wraplength=400).grid(row=2, column=1, sticky="w", padx=10, pady=(5, 10))
+            tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 12, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
+
+>>>>>>> Stashed changes
     def show_employee_interface(self):
         """Mostrar la interfaz del empleado con barra lateral y tarjetas."""
         self.clear_window()
