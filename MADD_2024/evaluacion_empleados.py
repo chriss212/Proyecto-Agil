@@ -2,13 +2,12 @@ import tkinter as tk
 from tkinter import messagebox
 import mariadb
 import sys
-from tkinter import simpledialog
 
 class EmployeeEvaluationApp:
     def __init__(self, master):
         self.master = master
         master.title("Evaluación del Desempeño de Empleados")
-        master.geometry("800x600")  # Ajustar el tamaño de la ventana para mostrar el diseño completo
+        master.geometry("800x600")
         master.configure(bg="#f0f4f7")
 
         # Conexión a la base de datos
@@ -85,13 +84,61 @@ class EmployeeEvaluationApp:
             if result:
                 role = result[0]
                 if role == "gerente":
-                    self.show_manager_interface()
+                    self.show_manager_interface()  # Llama a la interfaz del gerente
                 else:
-                    self.show_employee_interface()
+                    self.show_employee_interface()  # Llama a la interfaz del empleado
             else:
                 messagebox.showerror("Error", "Credenciales incorrectas. Intenta nuevamente.")
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo verificar las credenciales: {e}")
+
+    def show_manager_interface(self):
+        """Mostrar la interfaz del empleado con barra lateral y tarjetas."""
+        self.clear_window()
+
+        # Barra lateral
+        sidebar = tk.Frame(self.master, bg="#4A148C", width=200)
+        sidebar.pack(side="left", fill="y")
+
+        # Título del sistema
+        tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))  # Aumenté el padding superior a 30
+        tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack(pady=(0, 100))  # Agregué un padding inferior de 15
+
+        # Botones de la barra lateral
+        buttons = [("Home", "🏠"), ("Mis resultados", "📊"), ("Mi historial", "📁")]
+        for text, icon in buttons:
+            button = tk.Button(sidebar, text=f"{icon}  {text}", font=("Arial", 12), bg="#4A148C", fg="white", borderwidth=0)
+            button.pack(fill="x", pady=20, padx=20)  # Aumenté pady a 10 para más separació
+
+        # Botón de cerrar sesión
+        tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)  # Se añadió el comando para cerrar sesión
+
+        # Frame principal de la interfaz
+        main_frame = tk.Frame(self.master, bg="#f0f4f7")
+        main_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
+
+        # Saludo al gerente
+        tk.Label(main_frame, text="Bienvenido, gerente 👔 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
+
+        # Tarjetas de evaluación
+        card_data = [
+            ("Evaluar empleado", "Evaluación de Desempeño", "Evalúa el desempeño de un empleado en varias áreas clave.", self.evaluate_employee),
+            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de evaluaciones realizadas.", self.view_previous_evaluations),
+            ("Comparar desempeño de empleados", "Comparativa de Desempeño", "Compara el desempeño de varios empleados.", self.compare_employee_performance),
+            ("Generar reporte de desempeño", "Reportes de Desempeño", "Genera reportes detallados del desempeño de los empleados.", self.generate_performance_report),
+            ("Añadir feedback", "Feedback para Empleados", "Proporciona retroalimentación a los empleados sobre su desempeño.", self.add_feedback)
+        ]
+
+        for title, subtitle, description, command in card_data:
+            card = tk.Frame(main_frame, bg="white", bd=1, relief="solid")
+            card.pack(pady=5, fill="x", padx=5, ipadx=5, ipady=5)  # Margen reducido en el pack
+            tk.Label(card, text="📝", font=("Arial", 14, "bold"), bg="white", fg="#4A148C").grid(row=0, column=0, padx=5, pady=5)  # Fuente más pequeña
+            tk.Label(card, text=title, font=("Arial", 14, "bold"), bg="white", fg="#4A148C", wraplength=250).grid(row=0, column=1, sticky="w", pady=5)
+            tk.Label(card, text=subtitle, font=("Arial", 11), bg="white", fg="#757575", wraplength=250).grid(row=1, column=1, sticky="w")  # wraplength ajustado
+            tk.Label(card, text=description, font=("Arial", 9), bg="white", fg="#757575", wraplength=250).grid(row=2, column=1, sticky="w", padx=5, pady=(5, 10))
+            tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 10, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")  # Fuente más pequeña en botón
+
 
     def show_employee_interface(self):
         """Mostrar la interfaz del empleado con barra lateral y tarjetas."""
@@ -385,7 +432,6 @@ class EmployeeEvaluationApp:
                  
                  for i, score in enumerate(autoeval,1):
                     report_text += f" Pregunta {i}: {score}\n"
-<<<<<<< Updated upstream
 
                  # Procesar evaluación por gerente
                  if row[2]:
@@ -401,113 +447,6 @@ class EmployeeEvaluationApp:
                  # Calcular y agregar puntajes promedio
                  average_auto = sum(autoeval) / len(autoeval) if autoeval else 0
                  average_manager = sum(manager_eval) / len(manager_eval) if manager_eval else 0
-=======
-
-                 # Procesar evaluación por gerente
-                 if row[2]:
-                     manager_eval = eval(row[2])
-                     report_text += "Evaluación por Gerente:\n"
-                     
-                     for i, score in enumerate(manager_eval, 1):
-                         report_text += f" Pregunta {i}: {score}\n"
-                 else:
-                     report_text += \
-                         "Evaluación por Gerente: No disponible\n"
-
-                 # Calcular y agregar puntajes promedio
-                 average_auto = sum(autoeval) / len(autoeval) if autoeval else 0
-                 average_manager = sum(manager_eval) / len(manager_eval) if manager_eval else 0
-
-                 report_text += \
-                     f" Promedio Autoevaluación: {average_auto:.2f}\n"
-                 report_text += \
-                     f" Promedio Evaluación Gerente: {average_manager:.2f}\n"
-
-                 report_text += "-" * 50 + "\n" # Separator for better readability
-
-             # Mostrar reporte en una ventana nueva
-             report_window = tk.Toplevel(self.master)
-
-             report_window.title("Reporte de Desempeño")
-
-             #Color de la ventana
-             report_window.configure(bg="#432c81")
-             
-             report_window.focus_force()
-
-             report_text_area = scrolledtext.ScrolledText(report_window,
-                                            width=70,
-                                            height=20)
-
-             report_text_area.insert(tk.END,
-                                     report_text.strip())
-             
-             report_text_area.pack(padx=10,
-                                   pady=10)
-
-             # Add a button to close the report window
-             tk.Button(report_window,
-                       text="Cerrar",
-                       command=report_window.destroy,
-                       bg="#625b71",  # Color de fondo del botón
-                       fg="#ffffff"
-                       ).pack(pady=5)
-
-         except mariadb.Error as e:
-             messagebox.showerror("Error",
-                                  f"No se pudo generar el reporte: {e}")
-
-    def add_feedback(self):
-        """Función para añadir comentarios de feedback para un empleado."""
-        employee_name = simpledialog.askstring("Feedback", "Ingresa el nombre del empleado para darle feedback:")
-        if employee_name:
-            feedback = simpledialog.askstring("Feedback", "Escribe tus comentarios:")
-            if feedback:
-                try:
-                    # Verificar si el empleado existe en la tabla evaluaciones
-                    self.cursor.execute("SELECT id FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
-                    result = self.cursor.fetchone()
-                    
-                    if result:
-                        employee_id = result[0]
-                        # Insertar o actualizar feedback en la base de datos
-                        self.cursor.execute("UPDATE evaluaciones SET feedback=? WHERE id=?", (feedback, employee_id))
-                        self.conn.commit()
-                        messagebox.showinfo("Feedback", f"Feedback agregado para {employee_name}.")
-                    else:
-                        messagebox.showwarning("Advertencia", f"No se encontró un empleado con el nombre: {employee_name}.")
-                    
-                except mariadb.Error as e:
-                    messagebox.showerror("Error", f"No se pudo añadir el feedback: {e}")
-            else:
-                messagebox.showwarning("Advertencia", "El campo de feedback está vacío.")
-        else:
-            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
-
-    def view_feedback(self):
-        """Función para que los empleados vean su feedback."""
-        employee_name = simpledialog.askstring("Ver Feedback", "Ingresa tu nombre:")
-        
-        if employee_name:
-            try:
-                # Buscar el feedback del empleado en la base de datos
-                self.cursor.execute("SELECT feedback FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
-                result = self.cursor.fetchone()
-                
-                if result and result[0]:
-                    feedback = result[0]
-                    messagebox.showinfo("Feedback", f"Feedback para {employee_name}:\n\n{feedback}")
-                else:
-                    messagebox.showinfo("Feedback", f"No se encontró feedback para el empleado: {employee_name}.")
-                    
-            except mariadb.Error as e:
-                messagebox.showerror("Error", f"No se pudo recuperar el feedback: {e}")
-        else:
-            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
-       
-
-
->>>>>>> Stashed changes
 
                  report_text += \
                      f" Promedio Autoevaluación: {average_auto:.2f}\n"
