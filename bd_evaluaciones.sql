@@ -54,7 +54,7 @@ INSERT INTO `usuarios` (`id`, `nombre_usuario`, `contrasena`, `rol`) VALUES
 	(4, 'empleado3', 'contrasena321', 'empleado'),
 	(5, 'empleado4', 'contrasena654', 'empleado');
 	
-ALTER TABLE evaluaciones.evaluaciones ADD COLUMN feedback TEXT DEFAULT NULL;
+ALTER TABLE evaluaciones.evaluaciones ADD COLUMN feedback TEXT DEFAULT NULL;evaluaciones
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
