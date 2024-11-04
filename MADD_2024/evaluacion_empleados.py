@@ -37,6 +37,7 @@ class EmployeeEvaluationApp:
         for widget in self.master.winfo_children():
             widget.destroy()
 
+<<<<<<< Updated upstream
     def login_screen(self):
         """Crear la pantalla de inicio de sesión."""
         self.clear_window()
@@ -84,6 +85,8 @@ class EmployeeEvaluationApp:
         login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
         login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))  
 
+=======
+>>>>>>> Stashed changes
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
         username = self.username_entry.get()
