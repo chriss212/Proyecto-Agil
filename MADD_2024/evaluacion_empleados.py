@@ -51,7 +51,10 @@ class EmployeeEvaluationApp:
             widget.destroy()
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     def login_screen(self):
         """Crear la pantalla de inicio de sesión."""
         self.clear_window()
@@ -99,6 +102,9 @@ class EmployeeEvaluationApp:
         login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
         login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))  
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
@@ -152,6 +158,7 @@ class EmployeeEvaluationApp:
         tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
 
+<<<<<<< Updated upstream
     def show_employee_interface(self):
         """Mostrar la interfaz del empleado."""
         self.clear_window()
@@ -163,6 +170,48 @@ class EmployeeEvaluationApp:
         
         tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
+=======
+        # Barra lateral
+        sidebar = tk.Frame(self.master, bg="#4A148C", width=200)
+        sidebar.pack(side="left", fill="y")
+
+        # Título del sistema
+        tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))  # Aumenté el padding superior a 30
+        tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack(pady=(0, 100))  # Agregué un padding inferior de 15
+
+        # Botones de la barra lateral
+        buttons = [("Home", "🏠"), ("Mis resultados", "📊"), ("Mi historial", "📁")]
+        for text, icon in buttons:
+            button = tk.Button(sidebar, text=f"{icon}  {text}", font=("Arial", 12), bg="#4A148C", fg="white", borderwidth=0)
+            button.pack(fill="x", pady=20, padx=20)  # Aumenté pady a 10 para más separació
+
+        # Botón de cerrar sesión
+        tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)  # Se añadió el comando para cerrar sesión
+
+        # Frame principal de la interfaz
+        main_frame = tk.Frame(self.master, bg="#f0f4f7")
+        main_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
+
+        # Saludo al usuario con emoji de bienvenida
+        tk.Label(main_frame, text="Bienvenido, empleado 👋 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
+
+        # Tarjetas de evaluación
+        card_data = [
+            ("Realizar autoevaluación", "Autoevaluación de Desempeño", "Evalúa tu desempeño en tres áreas clave: habilidades, productividad y colaboración.", self.self_evaluation),
+            ("Evaluar pares", "Evaluación de Desempeño de Pares", "Evalúa el desempeño de tus compañeros en tres áreas clave.", self.view_previous_evaluations),
+            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de tus evaluaciones anteriores en esta sección.", self.view_previous_evaluations)
+        ]
+
+        for title, subtitle, description, command in card_data:
+            card = tk.Frame(main_frame, bg="white", bd=1, relief="solid")
+            card.pack(pady=10, fill="x", padx=10, ipadx=10, ipady=10)
+            tk.Label(card, text="📝", font=("Arial", 18, "bold"), bg="white", fg="#4A148C").grid(row=0, column=0, padx=10, pady=5)
+            tk.Label(card, text=title, font=("Arial", 16, "bold"), bg="white", fg="#4A148C").grid(row=0, column=1, sticky="w", pady=5)
+            tk.Label(card, text=subtitle, font=("Arial", 12), bg="white", fg="#757575").grid(row=1, column=1, sticky="w")
+            tk.Label(card, text=description, font=("Arial", 10), bg="white", fg="#757575").grid(row=2, column=1, sticky="w", padx=10, pady=(5, 10))
+            tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 12, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
+>>>>>>> Stashed changes
 
     def self_evaluation(self):
         questions = {
