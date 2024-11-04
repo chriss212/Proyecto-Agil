@@ -38,6 +38,7 @@ class EmployeeEvaluationApp:
         for widget in self.master.winfo_children():
             widget.destroy()
 
+<<<<<<< Updated upstream
     def login_screen(self):
         """Crear la pantalla de inicio de sesión."""
         self.clear_window()
@@ -75,6 +76,8 @@ class EmployeeEvaluationApp:
         login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login, bg="#4a0d77", fg="white", font=("Arial", 14, "bold"), bd=0, activebackground="#9c27b0", activeforeground="white")
         login_button.pack(pady=(15, 0))
 
+=======
+>>>>>>> Stashed changes
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
         username = self.username_entry.get()
