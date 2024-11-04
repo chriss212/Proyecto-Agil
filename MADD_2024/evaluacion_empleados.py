@@ -87,8 +87,12 @@ class EmployeeEvaluationApp:
 
         # Botón para crear cuenta
         create_account_button = tk.Button(main_frame, text="Crear Cuenta", command=self.create_account,
-                                        bg="#5bc0de", font=("Arial", 12))
-        create_account_button.pack(pady=5)
+                            bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
+                            bd=0, activebackground="#9c27b0", activeforeground="white")
+        create_account_button.pack(pady=(15, 0))
+
+        create_account_button.bind("<Enter>", lambda e: create_account_button.configure(bg="#9c27b0"))  
+        create_account_button.bind("<Leave>", lambda e: create_account_button.configure(bg="#8e24aa"))
 
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
@@ -138,6 +142,8 @@ class EmployeeEvaluationApp:
         tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Comparar Desempeño de Empleados", command=self.compare_performance, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Generar Reporte de Desempeño", command=self.generate_report, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Añadir Feedback", command=self.add_feedback, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+
         
         tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
@@ -150,6 +156,8 @@ class EmployeeEvaluationApp:
         
         tk.Button(self.master, text="Realizar Autoevaluación", command=self.self_evaluation, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Ver Evaluaciones Anteriores", command=self.view_previous_evaluations, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+        tk.Button(self.master, text="Ver Feedback", command=self.view_feedback, bg="#5bc0de", font=("Arial", 12)).pack(pady=10)
+
         
         tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
@@ -503,10 +511,7 @@ class EmployeeEvaluationApp:
                 messagebox.showerror("Error", f"No se pudo recuperar el feedback: {e}")
         else:
             messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
-       
-
-
-
+    
 
 if __name__ == "__main__":
     root = tk.Tk()
