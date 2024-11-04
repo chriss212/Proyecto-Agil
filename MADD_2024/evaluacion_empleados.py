@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import mariadb
 import sys
+from tkinter import simpledialog
 
 class EmployeeEvaluationApp:
     def __init__(self, master):
@@ -101,30 +102,33 @@ class EmployeeEvaluationApp:
         sidebar.pack(side="left", fill="y")
 
         # Título del sistema
-        tk.Label(sidebar, text="See.", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(20, 5))
-        tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack()
+        tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))  # Aumenté el padding superior a 30
+        tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack(pady=(0, 100))  # Agregué un padding inferior de 15
 
         # Botones de la barra lateral
         buttons = [("Home", "🏠"), ("Mis resultados", "📊"), ("Mi historial", "📁")]
         for text, icon in buttons:
             button = tk.Button(sidebar, text=f"{icon}  {text}", font=("Arial", 12), bg="#4A148C", fg="white", borderwidth=0)
-            button.pack(fill="x", pady=5, padx=10)
+            button.pack(fill="x", pady=20, padx=20)  # Aumenté pady a 10 para más separación
 
         # Botón de cerrar sesión
-        tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0).pack(side="bottom", pady=20, padx=10)
+        tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)  # Se añadió el comando para cerrar sesión
 
         # Frame principal de la interfaz
         main_frame = tk.Frame(self.master, bg="#f0f4f7")
         main_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
 
-        # Saludo al usuario
-        tk.Label(main_frame, text="Hola", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
+        # Saludo al usuario con emoji de bienvenida
+        tk.Label(main_frame, text="Bienvenido, empleado 👋 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
 
         # Tarjetas de evaluación
         card_data = [
             ("Realizar autoevaluación", "Autoevaluación de Desempeño", "Evalúa tu desempeño en tres áreas clave: habilidades, productividad y colaboración.", self.self_evaluation),
-            ("Evaluar pares", "Evaluación de Desempeño de Pares", "Evalúa el desempeño de tus compañeros en tres áreas clave.", self.view_previous_evaluations)
+            ("Evaluar pares", "Evaluación de Desempeño de Pares", "Evalúa el desempeño de tus compañeros en tres áreas clave.", self.view_previous_evaluations),
+            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de tus evaluaciones anteriores en esta sección.", self.view_previous_evaluations)
         ]
+
         for title, subtitle, description, command in card_data:
             card = tk.Frame(main_frame, bg="white", bd=1, relief="solid")
             card.pack(pady=10, fill="x", padx=10, ipadx=10, ipady=10)
@@ -133,14 +137,6 @@ class EmployeeEvaluationApp:
             tk.Label(card, text=subtitle, font=("Arial", 12), bg="white", fg="#757575").grid(row=1, column=1, sticky="w")
             tk.Label(card, text=description, font=("Arial", 10), bg="white", fg="#757575").grid(row=2, column=1, sticky="w", padx=10, pady=(5, 10))
             tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 12, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
-
-    # Métodos de ejemplo para las acciones
-    def self_evaluation(self):
-        messagebox.showinfo("Autoevaluación", "Función de autoevaluación.")
-
-    def view_previous_evaluations(self):
-        messagebox.showinfo("Evaluaciones Anteriores", "Función de ver evaluaciones anteriores.")
-
 
     def self_evaluation(self):
         questions = {
@@ -169,7 +165,9 @@ class EmployeeEvaluationApp:
 
         responses = []
         
+        # Aquí se realiza la evaluación de las categorías y las preguntas.
         for category, qs in questions.items():
+            # Mostrar la categoría antes de las preguntas
             messagebox.showinfo("Autoevaluación", f"Categoría: {category}")
             for question in qs:
                 response = simpledialog.askinteger("Autoevaluación", f"{question}\n(1: Malo, 5: Excelente)", minvalue=1, maxvalue=5)
@@ -182,20 +180,11 @@ class EmployeeEvaluationApp:
 
         average_score = sum(responses) / len(responses)
         
+        # Solicitar el nombre del empleado y mostrar la puntuación promedio
         employee_name = simpledialog.askstring("Nombre del Empleado", "Ingresa tu nombre:")
         
         if employee_name:
-            try:
-                autoeval_json = str(responses)
-
-                self.cursor.execute("INSERT INTO evaluaciones (nombre_empleado, rol, autoevaluacion) VALUES (?, ?, ?)", 
-                                    (employee_name, 'Empleado', autoeval_json))
-                
-                self.conn.commit()
-                
-                messagebox.showinfo("Resultados de Autoevaluación", f"Tu puntuación promedio es: {average_score:.2f}")
-            except mariadb.Error as e:
-                messagebox.showerror("Error", f"No se pudo guardar la autoevaluación: {e}")
+            messagebox.showinfo("Resultados de Autoevaluación", f"Tu puntuación promedio es: {average_score:.2f}")
         else:
             messagebox.showwarning("Advertencia", "Nombre de empleado no ingresado.")
 
