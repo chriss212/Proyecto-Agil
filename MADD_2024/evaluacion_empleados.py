@@ -1,17 +1,19 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog, scrolledtext
+from tkinter import messagebox
 import mariadb
 import sys
+from tkinter import simpledialog, scrolledtext
 
 class EmployeeEvaluationApp:
     def __init__(self, master):
         self.master = master
         master.title("Evaluación del Desempeño de Empleados")
-        master.geometry("400x400")
+        master.geometry("800x600")  # Ajustar el tamaño de la ventana para mostrar el diseño completo
         master.configure(bg="#f0f4f7")
 
         # Conexión a la base de datos
         self.connect_db()
+
         # Pantalla de inicio de sesión
         self.login_screen()
 
@@ -21,7 +23,7 @@ class EmployeeEvaluationApp:
             self.conn = mariadb.connect(
                 user="root",
                 password="suser",
-                host="localhost",
+                host="127.0.0.1",
                 port=3306,
                 database="evaluaciones"
             )
@@ -41,39 +43,33 @@ class EmployeeEvaluationApp:
         self.clear_window()
         
         # Establecer un fondo claro para toda la ventana
-        self.master.configure(bg="#FFFFFF")  # Fondo blanco
+        self.master.configure(bg="#FFFFFF")
 
         # Frame principal para centrar todo el contenido
         main_frame = tk.Frame(self.master, bg="#FFFFFF")
-        main_frame.pack(expand=True, pady=(20, 80))  
+        main_frame.pack(expand=True, pady=(20, 80))
 
-        # Título con color oscuro y centrado
-        title_label = tk.Label(
-            main_frame,
-            text="¡Bienvenido!",
-            font=("Arial", 28, "bold"),
-            bg="#FFFFFF",
-            fg="#1c0d02"  # Color oscuro para el título
-        )
-        title_label.pack(pady=(20, 15)) 
+        # Título
+        title_label = tk.Label(main_frame, text="¡Bienvenido!", font=("Arial", 28, "bold"), bg="#FFFFFF", fg="#1c0d02")
+        title_label.pack(pady=(20, 15))
 
-        # Frame para centrar y contener los campos de entrada
-        frame = tk.Frame(main_frame, bg="#e8d5ea", bd=5, relief=tk.RAISED)  
+        # Frame para los campos de entrada
+        frame = tk.Frame(main_frame, bg="#ffffdf", bd=5, relief=tk.RAISED)
         frame.pack(pady=10, padx=20)
 
         # Etiqueta y entrada para el usuario
-        tk.Label(frame, text="Usuario:", font=("Arial", 14), bg="#e8d5ea", fg="#1c0d02").grid(row=0, column=0, sticky='w', padx=(0, 10))
+        tk.Label(frame, text="Usuario:", font=("Arial", 14), bg="#ffffdf", fg="#1c0d02").grid(row=0, column=0, sticky='w', padx=(0, 10))
         self.username_entry = tk.Entry(frame, font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
         self.username_entry.grid(row=0, column=1)
-        self.username_entry.bind("<FocusIn>", lambda e: self.username_entry.configure(bg="#e0f7fa"))  
-        self.username_entry.bind("<FocusOut>", lambda e: self.username_entry.configure(bg="#ffffff"))  
+        self.username_entry.bind("<FocusIn>", lambda e: self.username_entry.configure(bg="#e0f7fa"))
+        self.username_entry.bind("<FocusOut>", lambda e: self.username_entry.configure(bg="#ffffff"))
 
         # Etiqueta y entrada para la contraseña
-        tk.Label(frame, text="Contraseña:", font=("Arial", 14), bg="#e8d5ea", fg="#1c0d02").grid(row=1, column=0, sticky='w', padx=(0, 10))
+        tk.Label(frame, text="Contraseña:", font=("Arial", 14), bg="#ffffdf", fg="#1c0d02").grid(row=1, column=0, sticky='w', padx=(0, 10), pady=(10, 0))
         self.password_entry = tk.Entry(frame, show='*', font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
-        self.password_entry.grid(row=1, column=1)
-        self.password_entry.bind("<FocusIn>", lambda e: self.password_entry.configure(bg="#e0f7fa"))  
-        self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))  
+        self.password_entry.grid(row=1, column=1, pady=(10, 0))
+        self.password_entry.bind("<FocusIn>", lambda e: self.password_entry.configure(bg="#e0f7fa"))
+        self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))
 
         # Botón de inicio de sesión con efecto hover
         login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login,
@@ -98,11 +94,9 @@ class EmployeeEvaluationApp:
         """Verificar credenciales y mostrar la interfaz correspondiente."""
         username = self.username_entry.get()
         password = self.password_entry.get()
-        
         try:
             self.cursor.execute("SELECT rol FROM usuarios WHERE nombre_usuario=? AND contrasena=?", (username, password))
             result = self.cursor.fetchone()
-
             if result:
                 role = result[0]
                 if role == "gerente":
@@ -111,7 +105,6 @@ class EmployeeEvaluationApp:
                     self.show_employee_interface()
             else:
                 messagebox.showerror("Error", "Credenciales incorrectas. Intenta nuevamente.")
-        
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo verificar las credenciales: {e}")
 
@@ -149,7 +142,7 @@ class EmployeeEvaluationApp:
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
 
     def show_employee_interface(self):
-        """Mostrar la interfaz del empleado."""
+        """Mostrar la interfaz del empleado con barra lateral y tarjetas."""
         self.clear_window()
         
         tk.Label(self.master, text="Bienvenido Empleado", font=("Arial", 18), bg="#f0f4f7").pack(pady=20)
@@ -161,6 +154,47 @@ class EmployeeEvaluationApp:
         
         tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
+
+        # Barra lateral
+        sidebar = tk.Frame(self.master, bg="#4A148C", width=200)
+        sidebar.pack(side="left", fill="y")
+
+        # Título del sistema
+        tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))  # Aumenté el padding superior a 30
+        tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack(pady=(0, 100))  # Agregué un padding inferior de 15
+
+        # Botones de la barra lateral
+        buttons = [("Home", "🏠"), ("Mis resultados", "📊"), ("Mi historial", "📁")]
+        for text, icon in buttons:
+            button = tk.Button(sidebar, text=f"{icon}  {text}", font=("Arial", 12), bg="#4A148C", fg="white", borderwidth=0)
+            button.pack(fill="x", pady=20, padx=20)  # Aumenté pady a 10 para más separació
+
+        # Botón de cerrar sesión
+        tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)  # Se añadió el comando para cerrar sesión
+
+        # Frame principal de la interfaz
+        main_frame = tk.Frame(self.master, bg="#f0f4f7")
+        main_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
+
+        # Saludo al usuario con emoji de bienvenida
+        tk.Label(main_frame, text="Bienvenido, empleado 👋 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
+
+        # Tarjetas de evaluación
+        card_data = [
+            ("Realizar autoevaluación", "Autoevaluación de Desempeño", "Evalúa tu desempeño en tres áreas clave: habilidades, productividad y colaboración.", self.self_evaluation),
+            ("Evaluar pares", "Evaluación de Desempeño de Pares", "Evalúa el desempeño de tus compañeros en tres áreas clave.", self.view_previous_evaluations),
+            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de tus evaluaciones anteriores en esta sección.", self.view_previous_evaluations)
+        ]
+
+        for title, subtitle, description, command in card_data:
+            card = tk.Frame(main_frame, bg="white", bd=1, relief="solid")
+            card.pack(pady=10, fill="x", padx=10, ipadx=10, ipady=10)
+            tk.Label(card, text="📝", font=("Arial", 18, "bold"), bg="white", fg="#4A148C").grid(row=0, column=0, padx=10, pady=5)
+            tk.Label(card, text=title, font=("Arial", 16, "bold"), bg="white", fg="#4A148C").grid(row=0, column=1, sticky="w", pady=5)
+            tk.Label(card, text=subtitle, font=("Arial", 12), bg="white", fg="#757575").grid(row=1, column=1, sticky="w")
+            tk.Label(card, text=description, font=("Arial", 10), bg="white", fg="#757575").grid(row=2, column=1, sticky="w", padx=10, pady=(5, 10))
+            tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 12, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
 
     def self_evaluation(self):
         questions = {
