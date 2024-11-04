@@ -438,6 +438,10 @@ class EmployeeEvaluationApp:
              report_window = tk.Toplevel(self.master)
 
              report_window.title("Reporte de Desempeño")
+
+             #Color de la ventana
+             report_window.configure(bg="#432c81")
+             
              report_window.focus_force()
 
              report_text_area = scrolledtext.ScrolledText(report_window,
@@ -453,7 +457,10 @@ class EmployeeEvaluationApp:
              # Add a button to close the report window
              tk.Button(report_window,
                        text="Cerrar",
-                       command=report_window.destroy).pack(pady=5)
+                       command=report_window.destroy,
+                       bg="#625b71",  # Color de fondo del botón
+                       fg="#ffffff"
+                       ).pack(pady=5)
 
          except mariadb.Error as e:
              messagebox.showerror("Error",
