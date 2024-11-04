@@ -456,6 +456,58 @@ class EmployeeEvaluationApp:
              messagebox.showerror("Error",
                                   f"No se pudo generar el reporte: {e}")
 
+    def add_feedback(self):
+        """Función para añadir comentarios de feedback para un empleado."""
+        employee_name = simpledialog.askstring("Feedback", "Ingresa el nombre del empleado para darle feedback:")
+        if employee_name:
+            feedback = simpledialog.askstring("Feedback", "Escribe tus comentarios:")
+            if feedback:
+                try:
+                    # Verificar si el empleado existe en la tabla evaluaciones
+                    self.cursor.execute("SELECT id FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
+                    result = self.cursor.fetchone()
+                    
+                    if result:
+                        employee_id = result[0]
+                        # Insertar o actualizar feedback en la base de datos
+                        self.cursor.execute("UPDATE evaluaciones SET feedback=? WHERE id=?", (feedback, employee_id))
+                        self.conn.commit()
+                        messagebox.showinfo("Feedback", f"Feedback agregado para {employee_name}.")
+                    else:
+                        messagebox.showwarning("Advertencia", f"No se encontró un empleado con el nombre: {employee_name}.")
+                    
+                except mariadb.Error as e:
+                    messagebox.showerror("Error", f"No se pudo añadir el feedback: {e}")
+            else:
+                messagebox.showwarning("Advertencia", "El campo de feedback está vacío.")
+        else:
+            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
+
+    def view_feedback(self):
+        """Función para que los empleados vean su feedback."""
+        employee_name = simpledialog.askstring("Ver Feedback", "Ingresa tu nombre:")
+        
+        if employee_name:
+            try:
+                # Buscar el feedback del empleado en la base de datos
+                self.cursor.execute("SELECT feedback FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
+                result = self.cursor.fetchone()
+                
+                if result and result[0]:
+                    feedback = result[0]
+                    messagebox.showinfo("Feedback", f"Feedback para {employee_name}:\n\n{feedback}")
+                else:
+                    messagebox.showinfo("Feedback", f"No se encontró feedback para el empleado: {employee_name}.")
+                    
+            except mariadb.Error as e:
+                messagebox.showerror("Error", f"No se pudo recuperar el feedback: {e}")
+        else:
+            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
+       
+
+
+
+
 if __name__ == "__main__":
     root = tk.Tk()
 
