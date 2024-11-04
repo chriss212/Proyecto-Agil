@@ -50,53 +50,6 @@ class EmployeeEvaluationApp:
         for widget in self.master.winfo_children():
             widget.destroy()
 
-    def login_screen(self):
-        """Crear la pantalla de inicio de sesión."""
-        self.clear_window()
-
-        # Establecer un fondo claro para toda la ventana
-        self.master.configure(bg="#FFFFFF")  # Fondo morado claro
-
-        # Frame principal para centrar todo el contenido, con un relleno inferior para subir los elementos
-        main_frame = tk.Frame(self.master, bg="#FFFFFF")
-        main_frame.pack(expand=True, pady=(20, 80))  
-
-        # Único título con color oscuro y centrado
-        title_label = tk.Label(
-            main_frame,
-            text="¡Bienvenido!",
-            font=("Arial", 28, "bold"),
-            bg="#FFFFFF",
-            fg="#1c0d02"  # Color oscuro para el título
-        )
-        title_label.pack(pady=(20, 15)) 
-
-        # Frame para centrar y contener los campos de entrada
-        frame = tk.Frame(main_frame, bg="#e8d5ea", bd=5, relief=tk.RAISED)  
-        frame.pack(pady=10, padx=20)
-
-        # Etiqueta y entrada para el usuario
-        tk.Label(frame, text="Usuario:", font=("Arial", 14), bg="#e8d5ea", fg="#1c0d02").grid(row=0, column=0, sticky='w', padx=(0, 10))
-        self.username_entry = tk.Entry(frame, font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
-        self.username_entry.grid(row=0, column=1)
-        self.username_entry.bind("<FocusIn>", lambda e: self.username_entry.configure(bg="#e0f7fa"))  
-        self.username_entry.bind("<FocusOut>", lambda e: self.username_entry.configure(bg="#ffffff"))  
-
-        # Etiqueta y entrada para la contraseña
-        tk.Label(frame, text="Contraseña:", font=("Arial", 14), bg="#e8d5ea", fg="#1c0d02").grid(row=1, column=0, sticky='w', padx=(0, 10))
-        self.password_entry = tk.Entry(frame, show='*', font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
-        self.password_entry.grid(row=1, column=1)
-        self.password_entry.bind("<FocusIn>", lambda e: self.password_entry.configure(bg="#e0f7fa"))  
-        self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))  
-
-        # Botón de inicio de sesión con efecto hover
-        login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login, bg="#47176b", fg="white", font=("Arial", 14, "bold"), bd=0, activebackground="#9c27b0", activeforeground="white")
-        login_button.pack(pady=(15, 0)) 
-
-        # Efecto hover para el botón
-        login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
-        login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))  
-
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
         username = self.username_entry.get()
@@ -435,10 +388,6 @@ class EmployeeEvaluationApp:
              report_window = tk.Toplevel(self.master)
 
              report_window.title("Reporte de Desempeño")
-
-             #Color de la ventana
-             report_window.configure(bg="#432c81")
-             
              report_window.focus_force()
 
              report_text_area = scrolledtext.ScrolledText(report_window,
@@ -454,66 +403,11 @@ class EmployeeEvaluationApp:
              # Add a button to close the report window
              tk.Button(report_window,
                        text="Cerrar",
-                       command=report_window.destroy,
-                       bg="#625b71",  # Color de fondo del botón
-                       fg="#ffffff"
-                       ).pack(pady=5)
+                       command=report_window.destroy).pack(pady=5)
 
          except mariadb.Error as e:
              messagebox.showerror("Error",
                                   f"No se pudo generar el reporte: {e}")
-
-    def add_feedback(self):
-        """Función para añadir comentarios de feedback para un empleado."""
-        employee_name = simpledialog.askstring("Feedback", "Ingresa el nombre del empleado para darle feedback:")
-        if employee_name:
-            feedback = simpledialog.askstring("Feedback", "Escribe tus comentarios:")
-            if feedback:
-                try:
-                    # Verificar si el empleado existe en la tabla evaluaciones
-                    self.cursor.execute("SELECT id FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
-                    result = self.cursor.fetchone()
-                    
-                    if result:
-                        employee_id = result[0]
-                        # Insertar o actualizar feedback en la base de datos
-                        self.cursor.execute("UPDATE evaluaciones SET feedback=? WHERE id=?", (feedback, employee_id))
-                        self.conn.commit()
-                        messagebox.showinfo("Feedback", f"Feedback agregado para {employee_name}.")
-                    else:
-                        messagebox.showwarning("Advertencia", f"No se encontró un empleado con el nombre: {employee_name}.")
-                    
-                except mariadb.Error as e:
-                    messagebox.showerror("Error", f"No se pudo añadir el feedback: {e}")
-            else:
-                messagebox.showwarning("Advertencia", "El campo de feedback está vacío.")
-        else:
-            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
-
-    def view_feedback(self):
-        """Función para que los empleados vean su feedback."""
-        employee_name = simpledialog.askstring("Ver Feedback", "Ingresa tu nombre:")
-        
-        if employee_name:
-            try:
-                # Buscar el feedback del empleado en la base de datos
-                self.cursor.execute("SELECT feedback FROM evaluaciones WHERE nombre_empleado=?", (employee_name,))
-                result = self.cursor.fetchone()
-                
-                if result and result[0]:
-                    feedback = result[0]
-                    messagebox.showinfo("Feedback", f"Feedback para {employee_name}:\n\n{feedback}")
-                else:
-                    messagebox.showinfo("Feedback", f"No se encontró feedback para el empleado: {employee_name}.")
-                    
-            except mariadb.Error as e:
-                messagebox.showerror("Error", f"No se pudo recuperar el feedback: {e}")
-        else:
-            messagebox.showwarning("Advertencia", "No se ingresó el nombre del empleado.")
-       
-
-
-
 
 if __name__ == "__main__":
     root = tk.Tk()
