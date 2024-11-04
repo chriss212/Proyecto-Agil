@@ -50,11 +50,6 @@ class EmployeeEvaluationApp:
         for widget in self.master.winfo_children():
             widget.destroy()
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
     def login_screen(self):
         """Crear la pantalla de inicio de sesión."""
         self.clear_window()
@@ -102,10 +97,6 @@ class EmployeeEvaluationApp:
         login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
         login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))  
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
         username = self.username_entry.get()
@@ -158,7 +149,7 @@ class EmployeeEvaluationApp:
         tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
 
-<<<<<<< Updated upstream
+
     def show_employee_interface(self):
         """Mostrar la interfaz del empleado."""
         self.clear_window()
@@ -170,7 +161,7 @@ class EmployeeEvaluationApp:
         
         tk.Button(self.master, text="Regresar a Iniciar Sesión", command=self.login_screen, bg="#f0ad4e", font=("Arial", 12)).pack(pady=10)
         tk.Button(self.master, text="Cerrar Aplicación", command=sys.exit, bg="#d9534f", fg="white", font=("Arial", 12)).pack(pady=10)
-=======
+
         # Barra lateral
         sidebar = tk.Frame(self.master, bg="#4A148C", width=200)
         sidebar.pack(side="left", fill="y")
@@ -211,7 +202,6 @@ class EmployeeEvaluationApp:
             tk.Label(card, text=subtitle, font=("Arial", 12), bg="white", fg="#757575").grid(row=1, column=1, sticky="w")
             tk.Label(card, text=description, font=("Arial", 10), bg="white", fg="#757575").grid(row=2, column=1, sticky="w", padx=10, pady=(5, 10))
             tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 12, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
->>>>>>> Stashed changes
 
     def self_evaluation(self):
         questions = {
