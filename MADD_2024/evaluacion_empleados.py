@@ -31,20 +31,6 @@ class EmployeeEvaluationApp:
             print(f"Error al conectar a la base de datos: {e}")
             sys.exit(1)
 
-    def login_screen(self):
-        """Crear la pantalla de inicio de sesión."""
-        self.clear_window()
-        tk.Label(self.master, text="Iniciar Sesión", font=("Arial", 18), bg="#f0f4f7").pack(pady=20)
-        tk.Label(self.master, text="Usuario:", font=("Arial", 12), bg="#f0f4f7").pack()
-        self.username_entry = tk.Entry(self.master, font=("Arial", 12))
-        self.username_entry.pack(pady=5)
-        tk.Label(self.master, text="Contraseña:", font=("Arial", 12), bg="#f0f4f7").pack()
-        self.password_entry = tk.Entry(self.master, show='*', font=("Arial", 12))
-        self.password_entry.pack(pady=5)
-        
-        tk.Button(self.master, text="Iniciar Sesión", command=self.login, bg="#5cb85c", fg="white", font=("Arial", 12)).pack(pady=20)
-        tk.Button(self.master, text="Crear Cuenta", command=self.create_account, bg="#5bc0de", font=("Arial", 12)).pack(pady=5)
-
     def clear_window(self):
         """Limpiar la ventana actual."""
         for widget in self.master.winfo_children():
@@ -53,15 +39,15 @@ class EmployeeEvaluationApp:
     def login_screen(self):
         """Crear la pantalla de inicio de sesión."""
         self.clear_window()
-
+        
         # Establecer un fondo claro para toda la ventana
-        self.master.configure(bg="#FFFFFF")  # Fondo morado claro
+        self.master.configure(bg="#FFFFFF")  # Fondo blanco
 
-        # Frame principal para centrar todo el contenido, con un relleno inferior para subir los elementos
+        # Frame principal para centrar todo el contenido
         main_frame = tk.Frame(self.master, bg="#FFFFFF")
         main_frame.pack(expand=True, pady=(20, 80))  
 
-        # Único título con color oscuro y centrado
+        # Título con color oscuro y centrado
         title_label = tk.Label(
             main_frame,
             text="¡Bienvenido!",
@@ -90,12 +76,19 @@ class EmployeeEvaluationApp:
         self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))  
 
         # Botón de inicio de sesión con efecto hover
-        login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login, bg="#47176b", fg="white", font=("Arial", 14, "bold"), bd=0, activebackground="#9c27b0", activeforeground="white")
+        login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login,
+                                bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
+                                bd=0, activebackground="#9c27b0", activeforeground="white")
         login_button.pack(pady=(15, 0)) 
 
         # Efecto hover para el botón
         login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
-        login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))  
+        login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))
+
+        # Botón para crear cuenta
+        create_account_button = tk.Button(main_frame, text="Crear Cuenta", command=self.create_account,
+                                        bg="#5bc0de", font=("Arial", 12))
+        create_account_button.pack(pady=5)
 
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
