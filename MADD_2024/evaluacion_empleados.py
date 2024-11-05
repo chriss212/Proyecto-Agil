@@ -126,203 +126,154 @@ class EmployeeEvaluationApp:
             messagebox.showwarning("Advertencia", "Nombre de usuario, contraseña y rol son requeridos. El rol debe ser 'empleado' o 'gerente'.")
 
     def show_manager_interface(self):
-        """Mostrar la interfaz del empleado con barra lateral y tarjetas."""
+        """Mostrar la interfaz del gerente sin scroll y con barra lateral completa."""
         self.clear_window()
 
-        # Frame principal para contener todo el contenido (incluyendo el canvas y scrollbar)
         main_container = tk.Frame(self.master)
-        main_container.pack(side="right", expand=True, fill="both", padx=20, pady=20)
+        main_container.pack(fill="both", expand=True)
 
-        # Canvas para permitir el scroll
-        canvas = tk.Canvas(main_container, bg="#f0f4f7")
-        canvas.pack(side="left", fill="both", expand=True)
+        sidebar = tk.Frame(main_container, bg="#4A148C", width=200, height=self.master.winfo_height())
+        sidebar.pack(side="left", fill="y")
 
-        # Scrollbar
-        scrollbar = tk.Scrollbar(main_container, orient="vertical", command=canvas.yview)
-        scrollbar.pack(side="right", fill="y")
-        canvas.config(yscrollcommand=scrollbar.set)
-
-        # Crear un frame dentro del canvas donde se colocará todo el contenido
-        content_frame = tk.Frame(canvas, bg="#f0f4f7")
-        canvas.create_window((0, 0), window=content_frame, anchor="nw")
-
-        # Actualizar el tamaño del canvas cuando el contenido cambie
-        content_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-
-        # Barra lateral
-        sidebar = tk.Frame(content_frame, bg="#4A148C", width=200)
-        sidebar.grid(row=0, column=0, rowspan=10, sticky="ns")
-
-        # Título del sistema
-        tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))
+        tk.Label(sidebar, text="SED", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))
         tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack(pady=(0, 100))
 
-        # Botones de la barra lateral
         buttons = [("Home", "🏠"), ("Mis resultados", "📊"), ("Mi historial", "📁")]
         for text, icon in buttons:
             button = tk.Button(sidebar, text=f"{icon}  {text}", font=("Arial", 12), bg="#4A148C", fg="white", borderwidth=0)
             button.pack(fill="x", pady=20, padx=20)
 
-        # Botón de cerrar sesión
         tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
                 command=self.login_screen).pack(side="bottom", pady=20, padx=10)
 
-        # Saludo al gerente
-        tk.Label(content_frame, text="Bienvenido, gerente 👔 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").grid(row=0, column=1, pady=(50, 5))
+        content_frame = tk.Frame(main_container, bg="#f0f4f7")
+        content_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
 
-        # Tarjetas de evaluación
-        card_data = [
-            ("Evaluar empleado", "Evaluación de Desempeño", "Evalúa el desempeño de un empleado en varias áreas clave.", self.manager_evaluation),
-            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de evaluaciones realizadas.", self.view_previous_evaluations),
-            ("Comparar desempeño de empleados", "Comparativa de Desempeño", "Compara el desempeño de varios empleados.", self.compare_performance),
-            ("Generar reporte de desempeño", "Reportes de Desempeño", "Genera reportes detallados del desempeño de los empleados.", self.generate_report),
-            ("Añadir feedback", "Feedback para Empleados", "Proporciona retroalimentación a los empleados sobre su desempeño.", self.add_feedback)
+        tk.Label(content_frame, text="Bienvenido, gerente 👔", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
+
+        card_titles = [
+            ("Evaluar empleado", self.manager_evaluation),
+            ("Ver evaluaciones anteriores", self.view_previous_evaluations),
+            ("Comparar desempeño de empleados", self.compare_performance),
+            ("Generar reporte de desempeño", self.generate_report),
+            ("Añadir feedback", self.add_feedback)
         ]
+        
+        for title, command in card_titles:
+            card = tk.Frame(content_frame, bg="white", bd=1, relief="solid", width=600, height=100)
+            card.pack(pady=10, fill="x")
+            card.pack_propagate(False)
 
-        row = 1  # Empezar desde la segunda fila
-        for title, subtitle, description, command in card_data:
-            card = tk.Frame(content_frame, bg="white", bd=1, relief="solid")
-            card.grid(row=row, column=1, pady=5, padx=5, sticky="ew")
-            tk.Label(card, text="📝", font=("Arial", 14, "bold"), bg="white", fg="#4A148C").grid(row=0, column=0, padx=5, pady=5)
-            tk.Label(card, text=title, font=("Arial", 14, "bold"), bg="white", fg="#4A148C", wraplength=250).grid(row=0, column=1, sticky="w", pady=5)
-            tk.Label(card, text=subtitle, font=("Arial", 11), bg="white", fg="#757575", wraplength=250).grid(row=1, column=1, sticky="w")
-            tk.Label(card, text=description, font=("Arial", 9), bg="white", fg="#757575", wraplength=250).grid(row=2, column=1, sticky="w", padx=5, pady=(5, 10))
-            tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 10, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
-            row += 1  # Incrementar la fila
-
+            tk.Label(card, text=title, font=("Arial", 14, "bold"), bg="white", fg="#4A148C").pack(anchor="w", padx=10, pady=5)
+            tk.Button(card, text="Comenzar", bg="#4A148C", fg="white", font=("Arial", 10, "bold"), relief="flat", command=command).pack(anchor="e", padx=10, pady=5)
 
     def show_employee_interface(self):
-        """Mostrar la interfaz del empleado con barra lateral y tarjetas."""
+        """Mostrar la interfaz del empleado con el mismo tamaño de tarjetas que las de gerente, conservando títulos específicos."""
         self.clear_window()
 
-        # Frame principal para contener todo el contenido (incluyendo el canvas y scrollbar)
         main_container = tk.Frame(self.master)
-        main_container.pack(side="right", expand=True, fill="both", padx=20, pady=20)
+        main_container.pack(fill="both", expand=True)
 
-        # Canvas para permitir el scroll
-        canvas = tk.Canvas(main_container, bg="#f0f4f7")
-        canvas.pack(side="left", fill="both", expand=True)
+        sidebar = tk.Frame(main_container, bg="#4A148C", width=200, height=self.master.winfo_height())
+        sidebar.pack(side="left", fill="y")
 
-        # Scrollbar
-        scrollbar = tk.Scrollbar(main_container, orient="vertical", command=canvas.yview)
-        scrollbar.pack(side="right", fill="y")
-        canvas.config(yscrollcommand=scrollbar.set)
-
-        # Crear un frame dentro del canvas donde se colocará todo el contenido
-        content_frame = tk.Frame(canvas, bg="#f0f4f7")
-        canvas.create_window((0, 0), window=content_frame, anchor="nw")
-
-        # Actualizar el tamaño del canvas cuando el contenido cambie
-        content_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-
-        # Barra lateral
-        sidebar = tk.Frame(content_frame, bg="#4A148C", width=200)
-        sidebar.grid(row=0, column=0, rowspan=10, sticky="ns")
-
-        # Título del sistema
-        tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))
+        tk.Label(sidebar, text="SED", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))
         tk.Label(sidebar, text="Sistema de Evaluación de Desempeño", font=("Arial", 10), bg="#4A148C", fg="white").pack(pady=(0, 100))
 
-        # Botones de la barra lateral
         buttons = [("Home", "🏠"), ("Mis resultados", "📊"), ("Mi historial", "📁")]
         for text, icon in buttons:
             button = tk.Button(sidebar, text=f"{icon}  {text}", font=("Arial", 12), bg="#4A148C", fg="white", borderwidth=0)
             button.pack(fill="x", pady=20, padx=20)
 
-        # Botón de cerrar sesión
         tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
                 command=self.login_screen).pack(side="bottom", pady=20, padx=10)
 
-        # Saludo al empleado
-        tk.Label(content_frame, text="Bienvenido, empleado 👋 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").grid(row=0, column=1, pady=(50, 5))
+        content_frame = tk.Frame(main_container, bg="#f0f4f7")
+        content_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
 
-        # Tarjetas de evaluación
-        card_data = [
-            ("Realizar autoevaluación", "Autoevaluación de Desempeño", "Evalúa tu desempeño en tres áreas clave: habilidades, productividad y colaboración.", self.self_evaluation),
-            ("Evaluar pares", "Evaluación de Desempeño de Pares", "Evalúa el desempeño de tus compañeros en tres áreas clave.", self.view_previous_evaluations),
-            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de tus evaluaciones anteriores en esta sección.", self.view_previous_evaluations),
-            ("Ver feedback", "Revisar feedback hecho por el gerente", "Revisa el feedback que tu gerente te ha dejado en base a tu desempeño.", self.view_feedback)
+        tk.Label(content_frame, text="Bienvenido, empleado 👔", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
+
+        card_titles = [
+            ("Autoevaluación", self.self_evaluation),
+            ("Ver evaluaciones anteriores", self.view_previous_evaluations),
+            ("Ver feedback recibido", self.view_feedback),
         ]
+        
+        for title, command in card_titles:
+            card = tk.Frame(content_frame, bg="white", bd=1, relief="solid", width=600, height=100)
+            card.pack(pady=10, fill="x")
+            card.pack_propagate(False)
 
-        row = 1  # Empezar desde la segunda fila
-        for title, subtitle, description, command in card_data:
-            card = tk.Frame(content_frame, bg="white", bd=1, relief="solid")
-            card.grid(row=row, column=1, pady=10, padx=10, sticky="ew")
-            tk.Label(card, text="📝", font=("Arial", 18, "bold"), bg="white", fg="#4A148C").grid(row=0, column=0, padx=10, pady=5)
-            tk.Label(card, text=title, font=("Arial", 16, "bold"), bg="white", fg="#4A148C").grid(row=0, column=1, sticky="w", pady=5)
-            tk.Label(card, text=subtitle, font=("Arial", 12), bg="white", fg="#757575").grid(row=1, column=1, sticky="w")
-            tk.Label(card, text=description, font=("Arial", 10), bg="white", fg="#757575").grid(row=2, column=1, sticky="w", padx=10, pady=(5, 10))
-            tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 12, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
-            row += 1  # Incrementar la fila
+            tk.Label(card, text=title, font=("Arial", 14, "bold"), bg="white", fg="#4A148C").pack(anchor="w", padx=10, pady=5)
+            tk.Button(card, text="Comenzar", bg="#4A148C", fg="white", font=("Arial", 10, "bold"), relief="flat", command=command).pack(anchor="e", padx=10, pady=5)
 
 
     def self_evaluation(self):
-        questions = {
-            "Puntualidad": [
-                "1. ¿Con qué frecuencia llegas a tiempo a tu lugar de trabajo?",
-                "2. ¿Cumples con los plazos establecidos para la entrega de tareas?",
-                "3. ¿Cómo calificas tu capacidad para asistir a reuniones programadas puntualmente?",
-                "4. ¿Te consideras una persona que respeta el horario laboral establecido?",
-                "5. ¿Cómo evalúas tu compromiso con la puntualidad en el trabajo?"
-            ],
-            "Desempeño": [
-                "1. ¿Cómo calificarías la calidad de tu trabajo en general?",
-                "2. ¿Con qué frecuencia superas las expectativas en tus tareas asignadas?",
-                "3. ¿Cómo evalúas tu capacidad para resolver problemas de manera efectiva?",
-                "4. ¿Qué tan bien manejas las tareas bajo presión o en situaciones de estrés?",
-                "5. ¿Cómo calificas tu habilidad para aprender y aplicar nuevos conocimientos o habilidades en tu trabajo?"
-            ],
-            "Trabajo en Equipo": [
-                "1. ¿Cómo calificarías tu habilidad para colaborar con otros miembros del equipo?",
-                "2. ¿Con qué frecuencia ofreces ayuda a tus compañeros cuando lo necesitan?",
-                "3. ¿Cómo evalúas tu capacidad para comunicarte efectivamente con el equipo?",
-                "4. ¿Qué tan bien manejas los conflictos dentro del equipo?",
-                "5. ¿Cómo calificas tu disposición para aceptar críticas constructivas de tus compañeros?"
-            ]
-        }
+            questions = {
+                "Puntualidad": [
+                    "1. ¿Con qué frecuencia llegas a tiempo a tu lugar de trabajo?",
+                    "2. ¿Cumples con los plazos establecidos para la entrega de tareas?",
+                    "3. ¿Cómo calificas tu capacidad para asistir a reuniones programadas puntualmente?",
+                    "4. ¿Te consideras una persona que respeta el horario laboral establecido?",
+                    "5. ¿Cómo evalúas tu compromiso con la puntualidad en el trabajo?"
+                ],
+                "Desempeño": [
+                    "1. ¿Cómo calificarías la calidad de tu trabajo en general?",
+                    "2. ¿Con qué frecuencia superas las expectativas en tus tareas asignadas?",
+                    "3. ¿Cómo evalúas tu capacidad para resolver problemas de manera efectiva?",
+                    "4. ¿Qué tan bien manejas las tareas bajo presión o en situaciones de estrés?",
+                    "5. ¿Cómo calificas tu habilidad para aprender y aplicar nuevos conocimientos o habilidades en tu trabajo?"
+                ],
+                "Trabajo en Equipo": [
+                    "1. ¿Cómo calificarías tu habilidad para colaborar con otros miembros del equipo?",
+                    "2. ¿Con qué frecuencia ofreces ayuda a tus compañeros cuando lo necesitan?",
+                    "3. ¿Cómo evalúas tu capacidad para comunicarte efectivamente con el equipo?",
+                    "4. ¿Qué tan bien manejas los conflictos dentro del equipo?",
+                    "5. ¿Cómo calificas tu disposición para aceptar críticas constructivas de tus compañeros?"
+                ]
+            }
 
-        responses = []
+            responses = []
 
-        for category, qs in questions.items():
-            messagebox.showinfo("Autoevaluación", f"Categoría: {category}")
-            for question in qs:
-                response = simpledialog.askinteger("Autoevaluación",
-                                                    f"{question}\n(1: Malo, 5: Excelente)",
-                                                    minvalue=1,
-                                                    maxvalue=5)
-                if response is not None:
-                    responses.append(response)
+            for category, qs in questions.items():
+                messagebox.showinfo("Autoevaluación", f"Categoría: {category}")
+                for question in qs:
+                    response = simpledialog.askinteger("Autoevaluación",
+                                                        f"{question}\n(1: Malo, 5: Excelente)",
+                                                        minvalue=1,
+                                                        maxvalue=5)
+                    if response is not None:
+                        responses.append(response)
 
-        if not responses:
-            messagebox.showwarning("Advertencia",
-                                    "No se realizaron respuestas a la autoevaluación.")
-            return
+            if not responses:
+                messagebox.showwarning("Advertencia",
+                                        "No se realizaron respuestas a la autoevaluación.")
+                return
 
-        average_score = sum(responses) / len(responses)
-        
-        employee_name = simpledialog.askstring("Nombre del Empleado",
-                                                "Ingresa tu nombre:")
-        
-        if employee_name:
-            try:
-                autoeval_json = str(responses)
-                
-                self.cursor.execute(
-                    "INSERT INTO evaluaciones (nombre_empleado, rol, autoevaluacion) VALUES (?, ?, ?)",
-                    (employee_name, 'Empleado', autoeval_json))
-                
-                self.conn.commit()
-                
-                messagebox.showinfo("Resultados de Autoevaluación",
-                                    f"Tu puntuación promedio es: {average_score:.2f}")
-                
-            except mariadb.Error as e:
-                messagebox.showerror("Error",
-                                     f"No se pudo guardar la autoevaluación: {e}")
-                
-        else:
-            messagebox.showwarning("Advertencia",
-                                   "Nombre de empleado no ingresado.")
+            average_score = sum(responses) / len(responses)
+            
+            employee_name = simpledialog.askstring("Nombre del Empleado",
+                                                    "Ingresa tu nombre:")
+            
+            if employee_name:
+                try:
+                    autoeval_json = str(responses)
+                    
+                    self.cursor.execute(
+                        "INSERT INTO evaluaciones (nombre_empleado, rol, autoevaluacion) VALUES (?, ?, ?)",
+                        (employee_name, 'Empleado', autoeval_json))
+                    
+                    self.conn.commit()
+                    
+                    messagebox.showinfo("Resultados de Autoevaluación",
+                                        f"Tu puntuación promedio es: {average_score:.2f}")
+                    
+                except mariadb.Error as e:
+                    messagebox.showerror("Error",
+                                        f"No se pudo guardar la autoevaluación: {e}")      
+            else:
+                messagebox.showwarning("Advertencia",
+                                    "Nombre de empleado no ingresado.")
 
     def manager_evaluation(self):
         employee_name = simpledialog.askstring("Nombre del Empleado",
