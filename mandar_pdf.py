@@ -7,6 +7,13 @@ from email.mime.base import MIMEBase
 from email import encoders
 import os
 #Agregar a la clase EmployeeEvaluationApp
+def prompt_send_email(self, employee_name, autoeval, manager_eval):
+    """Generar PDF y preguntar por el correo del empleado para enviar la evaluación."""
+    pdf_filename = self.generate_pdf(employee_name, autoeval, manager_eval)
+    to_email = simpledialog.askstring("Enviar Correo", "Ingresa el correo electrónico del empleado:")
+    if to_email:
+        self.send_email(to_email, pdf_filename)
+        
 def generate_pdf(self, employee_name, autoeval, manager_eval):
     """Generar un PDF con los resultados de la evaluación."""
     pdf_filename = f"{employee_name}_evaluacion.pdf"
@@ -62,9 +69,4 @@ def send_email(self, to_email, pdf_filename):
     finally:
         os.remove(pdf_filename)  
 
-def prompt_send_email(self, employee_name, autoeval, manager_eval):
-    """Generar PDF y preguntar por el correo del empleado para enviar la evaluación."""
-    pdf_filename = self.generate_pdf(employee_name, autoeval, manager_eval)
-    to_email = simpledialog.askstring("Enviar Correo", "Ingresa el correo electrónico del empleado:")
-    if to_email:
-        self.send_email(to_email, pdf_filename)
+
