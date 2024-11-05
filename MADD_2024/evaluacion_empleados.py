@@ -1,8 +1,7 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 import mariadb
 import sys
-from tkinter import simpledialog, scrolledtext
 
 class EmployeeEvaluationApp:
     def __init__(self, master):
@@ -22,7 +21,7 @@ class EmployeeEvaluationApp:
         try:
             self.conn = mariadb.connect(
                 user="root",
-                password="suser",
+                password="28marzo2005",
                 host="127.0.0.1",
                 port=3306,
                 database="evaluaciones"
@@ -71,24 +70,17 @@ class EmployeeEvaluationApp:
         self.password_entry.bind("<FocusIn>", lambda e: self.password_entry.configure(bg="#e0f7fa"))
         self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))
 
-        # Botón de inicio de sesión con efecto hover
+        # Botón de inicio de sesión
         login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login,
-                                bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
-                                bd=0, activebackground="#9c27b0", activeforeground="white")
-        login_button.pack(pady=(15, 0)) 
-
-        # Efecto hover para el botón
-        login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
-        login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))
+                                 bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
+                                 bd=0, activebackground="#9c27b0", activeforeground="white")
+        login_button.pack(pady=(15, 0))
 
         # Botón para crear cuenta
         create_account_button = tk.Button(main_frame, text="Crear Cuenta", command=self.create_account,
-                            bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
-                            bd=0, activebackground="#9c27b0", activeforeground="white")
+                                          bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
+                                          bd=0, activebackground="#9c27b0", activeforeground="white")
         create_account_button.pack(pady=(15, 0))
-
-        create_account_button.bind("<Enter>", lambda e: create_account_button.configure(bg="#9c27b0"))  
-        create_account_button.bind("<Leave>", lambda e: create_account_button.configure(bg="#8e24aa"))
 
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
@@ -112,7 +104,6 @@ class EmployeeEvaluationApp:
         """Crear una nueva cuenta de usuario."""
         username = simpledialog.askstring("Crear Cuenta", "Ingresa un nombre de usuario:")
         password = simpledialog.askstring("Crear Cuenta", "Ingresa una contraseña:", show='*')
-        # Preguntar por el rol del usuario
         role = simpledialog.askstring("Seleccionar Rol", "Ingresa el rol (empleado/gerente):").lower()
         
         if username and password and role in ['empleado', 'gerente']:
@@ -126,32 +117,16 @@ class EmployeeEvaluationApp:
             messagebox.showwarning("Advertencia", "Nombre de usuario, contraseña y rol son requeridos. El rol debe ser 'empleado' o 'gerente'.")
 
     def show_manager_interface(self):
-        """Mostrar la interfaz del empleado con barra lateral y tarjetas."""
+        """Mostrar la interfaz del gerente sin scroll y con barra lateral completa."""
         self.clear_window()
 
-        # Frame principal para contener todo el contenido (incluyendo el canvas y scrollbar)
+        # Contenedor principal
         main_container = tk.Frame(self.master)
-        main_container.pack(side="right", expand=True, fill="both", padx=20, pady=20)
-
-        # Canvas para permitir el scroll
-        canvas = tk.Canvas(main_container, bg="#f0f4f7")
-        canvas.pack(side="left", fill="both", expand=True)
-
-        # Scrollbar
-        scrollbar = tk.Scrollbar(main_container, orient="vertical", command=canvas.yview)
-        scrollbar.pack(side="right", fill="y")
-        canvas.config(yscrollcommand=scrollbar.set)
-
-        # Crear un frame dentro del canvas donde se colocará todo el contenido
-        content_frame = tk.Frame(canvas, bg="#f0f4f7")
-        canvas.create_window((0, 0), window=content_frame, anchor="nw")
-
-        # Actualizar el tamaño del canvas cuando el contenido cambie
-        content_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        main_container.pack(fill="both", expand=True)
 
         # Barra lateral
-        sidebar = tk.Frame(content_frame, bg="#4A148C", width=200)
-        sidebar.grid(row=0, column=0, rowspan=10, sticky="ns")
+        sidebar = tk.Frame(main_container, bg="#4A148C", width=200, height=self.master.winfo_height())
+        sidebar.pack(side="left", fill="y")
 
         # Título del sistema
         tk.Label(sidebar, text="See", font=("Arial", 24, "bold"), bg="#4A148C", fg="white").pack(pady=(50, 5))
@@ -165,30 +140,25 @@ class EmployeeEvaluationApp:
 
         # Botón de cerrar sesión
         tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
-                command=self.login_screen).pack(side="bottom", pady=20, padx=10)
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)
+
+        # Contenido principal
+        content_frame = tk.Frame(main_container, bg="#f0f4f7")
+        content_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
 
         # Saludo al gerente
-        tk.Label(content_frame, text="Bienvenido, gerente 👔 ", font=("Arial", 14), bg="#f0f4f7", fg="#4A148C").grid(row=0, column=1, pady=(50, 5))
+        tk.Label(content_frame, text="Bienvenido, gerente 👔", font=("Arial", 14),  bg="#f0f4f7", fg="#4A148C").pack(anchor="ne")
 
         # Tarjetas de evaluación
-        card_data = [
-            ("Evaluar empleado", "Evaluación de Desempeño", "Evalúa el desempeño de un empleado en varias áreas clave.", self.manager_evaluation),
-            ("Ver evaluaciones anteriores", "Historial de Evaluaciones", "Revisa el historial de evaluaciones realizadas.", self.view_previous_evaluations),
-            ("Comparar desempeño de empleados", "Comparativa de Desempeño", "Compara el desempeño de varios empleados.", self.compare_performance),
-            ("Generar reporte de desempeño", "Reportes de Desempeño", "Genera reportes detallados del desempeño de los empleados.", self.generate_report),
-            ("Añadir feedback", "Feedback para Empleados", "Proporciona retroalimentación a los empleados sobre su desempeño.", self.add_feedback)
-        ]
+        card_titles = ["Evaluar empleado", "Ver evaluaciones anteriores", "Comparar desempeño de empleados", "Generar reporte de desempeño", "Añadir feedback"]
+        for title in card_titles:
+            card = tk.Frame(content_frame, bg="white", bd=1, relief="solid", width=600, height=100)
+            card.pack(pady=10, fill="x")
+            card.pack_propagate(False)
 
-        row = 1  # Empezar desde la segunda fila
-        for title, subtitle, description, command in card_data:
-            card = tk.Frame(content_frame, bg="white", bd=1, relief="solid")
-            card.grid(row=row, column=1, pady=5, padx=5, sticky="ew")
-            tk.Label(card, text="📝", font=("Arial", 14, "bold"), bg="white", fg="#4A148C").grid(row=0, column=0, padx=5, pady=5)
-            tk.Label(card, text=title, font=("Arial", 14, "bold"), bg="white", fg="#4A148C", wraplength=250).grid(row=0, column=1, sticky="w", pady=5)
-            tk.Label(card, text=subtitle, font=("Arial", 11), bg="white", fg="#757575", wraplength=250).grid(row=1, column=1, sticky="w")
-            tk.Label(card, text=description, font=("Arial", 9), bg="white", fg="#757575", wraplength=250).grid(row=2, column=1, sticky="w", padx=5, pady=(5, 10))
-            tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 10, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
-            row += 1  # Incrementar la fila
+            # Título y botón de la tarjeta
+            tk.Label(card, text=title, font=("Arial", 14, "bold"), bg="white", fg="#4A148C").pack(anchor="w", padx=10, pady=5)
+            tk.Button(card, text="Comenzar", bg="#4A148C", fg="white", font=("Arial", 10, "bold"), relief="flat").pack(anchor="e", padx=10, pady=5)
 
 
     def show_employee_interface(self):
@@ -254,6 +224,7 @@ class EmployeeEvaluationApp:
             tk.Label(card, text=description, font=("Arial", 10), bg="white", fg="#757575").grid(row=2, column=1, sticky="w", padx=10, pady=(5, 10))
             tk.Button(card, text="Comenzar", command=command, bg="#4A148C", fg="white", font=("Arial", 12, "bold"), relief="flat").grid(row=3, column=1, pady=(10, 5), sticky="e")
             row += 1  # Incrementar la fila
+            
 
 
     def self_evaluation(self):
