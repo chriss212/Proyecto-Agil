@@ -86,7 +86,6 @@ class EmployeeEvaluationApp:
         try:
             self.cursor.execute("SELECT rol FROM usuarios WHERE nombre_usuario=? AND contrasena=?", (username, password))
             result = self.cursor.fetchone()
-            # print("Resultado de la consulta:", result)  # Depuración
             if result:
                 role = result[0]
                 if role == "gerente":
@@ -378,8 +377,7 @@ class EmployeeEvaluationApp:
             os.remove(pdf_filename)  
 
     def view_previous_evaluations(self):
-        employee_name = simpledialog.askstring("Nombre del Empleado",
-                                                "Ingresa tu nombre:")
+        employee_name = simpledialog.askstring("Nombre del Empleado", "Ingresa tu nombre:")
         
         if employee_name:
             try:
