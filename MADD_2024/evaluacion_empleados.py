@@ -306,7 +306,6 @@ class EmployeeEvaluationApp:
                 messagebox.showinfo("Resultados de Evaluación",
                                     f"La puntuación promedio del empleado {employee_name} es: {average_score:.2f}")
                 
-                # Asegúrate de llamar a prompt_send_email correctamente
                 self.prompt_send_email(employee_name, responses, manager_eval_json)
 
             except mariadb.Error as e:
