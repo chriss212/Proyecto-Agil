@@ -1,14 +1,13 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog, scrolledtext
 import mariadb
 import sys
-from tkinter import simpledialog, scrolledtext
 
 class EmployeeEvaluationApp:
     def __init__(self, master):
         self.master = master
         master.title("Evaluación del Desempeño de Empleados")
-        master.geometry("800x600")  # Ajustar el tamaño de la ventana para mostrar el diseño completo
+        master.geometry("800x600")
         master.configure(bg="#f0f4f7")
 
         # Conexión a la base de datos
@@ -41,62 +40,45 @@ class EmployeeEvaluationApp:
     def login_screen(self):
         """Crear la pantalla de inicio de sesión."""
         self.clear_window()
-        
-        # Establecer un fondo claro para toda la ventana
         self.master.configure(bg="#FFFFFF")
 
-        # Frame principal para centrar todo el contenido
         main_frame = tk.Frame(self.master, bg="#FFFFFF")
         main_frame.pack(expand=True, pady=(20, 80))
 
-        # Título
         title_label = tk.Label(main_frame, text="¡Bienvenido!", font=("Arial", 28, "bold"), bg="#FFFFFF", fg="#1c0d02")
         title_label.pack(pady=(20, 15))
 
-        # Frame para los campos de entrada
         frame = tk.Frame(main_frame, bg="#ffffdf", bd=5, relief=tk.RAISED)
         frame.pack(pady=10, padx=20)
 
-        # Etiqueta y entrada para el usuario
         tk.Label(frame, text="Usuario:", font=("Arial", 14), bg="#ffffdf", fg="#1c0d02").grid(row=0, column=0, sticky='w', padx=(0, 10))
         self.username_entry = tk.Entry(frame, font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
         self.username_entry.grid(row=0, column=1)
-        self.username_entry.bind("<FocusIn>", lambda e: self.username_entry.configure(bg="#e0f7fa"))
-        self.username_entry.bind("<FocusOut>", lambda e: self.username_entry.configure(bg="#ffffff"))
 
-        # Etiqueta y entrada para la contraseña
         tk.Label(frame, text="Contraseña:", font=("Arial", 14), bg="#ffffdf", fg="#1c0d02").grid(row=1, column=0, sticky='w', padx=(0, 10), pady=(10, 0))
         self.password_entry = tk.Entry(frame, show='*', font=("Arial", 12), bg="#ffffff", fg="#000000", width=20, bd=2, relief=tk.FLAT)
         self.password_entry.grid(row=1, column=1, pady=(10, 0))
-        self.password_entry.bind("<FocusIn>", lambda e: self.password_entry.configure(bg="#e0f7fa"))
-        self.password_entry.bind("<FocusOut>", lambda e: self.password_entry.configure(bg="#ffffff"))
 
-        # Botón de inicio de sesión con efecto hover
         login_button = tk.Button(main_frame, text="Iniciar Sesión", command=self.login,
-                                bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
-                                bd=0, activebackground="#9c27b0", activeforeground="white")
-        login_button.pack(pady=(15, 0)) 
+                                 bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
+                                 bd=0, activebackground="#9c27b0", activeforeground="white")
+        login_button.pack(pady=(15, 0))
 
-        # Efecto hover para el botón
-        login_button.bind("<Enter>", lambda e: login_button.configure(bg="#9c27b0"))  
-        login_button.bind("<Leave>", lambda e: login_button.configure(bg="#8e24aa"))
-
-        # Botón para crear cuenta
         create_account_button = tk.Button(main_frame, text="Crear Cuenta", command=self.create_account,
-                            bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
-                            bd=0, activebackground="#9c27b0", activeforeground="white")
+                                          bg="#47176b", fg="white", font=("Arial", 14, "bold"), 
+                                          bd=0, activebackground="#9c27b0", activeforeground="white")
         create_account_button.pack(pady=(15, 0))
-
-        create_account_button.bind("<Enter>", lambda e: create_account_button.configure(bg="#9c27b0"))  
-        create_account_button.bind("<Leave>", lambda e: create_account_button.configure(bg="#8e24aa"))
 
     def login(self):
         """Verificar credenciales y mostrar la interfaz correspondiente."""
         username = self.username_entry.get()
         password = self.password_entry.get()
+        print(f"Usuario ingresado: {username}, Contraseña ingresada: {password}")  # Depuración
+
         try:
             self.cursor.execute("SELECT rol FROM usuarios WHERE nombre_usuario=? AND contrasena=?", (username, password))
             result = self.cursor.fetchone()
+            print("Resultado de la consulta:", result)  # Depuración
             if result:
                 role = result[0]
                 if role == "gerente":
@@ -112,9 +94,8 @@ class EmployeeEvaluationApp:
         """Crear una nueva cuenta de usuario."""
         username = simpledialog.askstring("Crear Cuenta", "Ingresa un nombre de usuario:")
         password = simpledialog.askstring("Crear Cuenta", "Ingresa una contraseña:", show='*')
-        # Preguntar por el rol del usuario
         role = simpledialog.askstring("Seleccionar Rol", "Ingresa el rol (empleado/gerente):").lower()
-        
+
         if username and password and role in ['empleado', 'gerente']:
             try:
                 self.cursor.execute("INSERT INTO usuarios (nombre_usuario, contrasena, rol) VALUES (?, ?, ?)", (username, password, role))
@@ -144,7 +125,7 @@ class EmployeeEvaluationApp:
             button.pack(fill="x", pady=20, padx=20)
 
         tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
-                command=self.login_screen).pack(side="bottom", pady=20, padx=10)
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)
 
         content_frame = tk.Frame(main_container, bg="#f0f4f7")
         content_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
@@ -186,7 +167,7 @@ class EmployeeEvaluationApp:
             button.pack(fill="x", pady=20, padx=20)
 
         tk.Button(sidebar, text="Log out", font=("Arial", 12, "bold"), bg="#A4A4A4", fg="white", borderwidth=0,
-                command=self.login_screen).pack(side="bottom", pady=20, padx=10)
+                  command=self.login_screen).pack(side="bottom", pady=20, padx=10)
 
         content_frame = tk.Frame(main_container, bg="#f0f4f7")
         content_frame.pack(side="right", expand=True, fill="both", padx=20, pady=20)
