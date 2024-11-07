@@ -424,6 +424,8 @@ class EmployeeEvaluationApp:
             
             send_email_button.pack(pady=(20, 10))
 
+
+
         except mariadb.Error as e:
             messagebox.showerror("Error", f"No se pudo guardar la evaluación del gerente: {e}")
 
