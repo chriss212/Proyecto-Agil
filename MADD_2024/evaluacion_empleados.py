@@ -560,15 +560,23 @@ class EmployeeEvaluationApp:
         
         c.drawString(100, 750, f"Evaluación de Desempeño de {employee_name}")
         
-        c.drawString(100, 730, "Autoevaluación:")
+        c.drawString(100, 730, "Autoevaluación y Evaluación por Gerente:")
+
+        # Lista de preguntas
+        questions = [
+                "1. ¿Cómo calificarías la calidad del trabajo del empleado?",
+                "2. ¿Con qué frecuencia supera las expectativas en sus tareas asignadas?",
+                "3. ¿Cómo evalúas su capacidad para resolver problemas?",
+                "4. ¿Qué tan bien maneja las tareas bajo presión?",
+                "5. ¿Cómo calificas su habilidad para trabajar en equipo?"
+        ]
+    
         
         y_position = 710
         
-        for i, score in enumerate(autoeval):
-            c.drawString(100, y_position, f"Pregunta {i + 1}: {score}")
+        for i, (question, score) in enumerate(zip(questions, autoeval), start=1):
+            c.drawString(100, y_position, f"{question} Respuesta: {score}")
             y_position -= 20
-
-        c.drawString(100,y_position-20,"Evaluación por Gerente:")
 
         c.save()
         return pdf_filename
